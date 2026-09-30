@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  # 1. FastAPI Cybersecurity Core API
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    container_name: cipherx-backend
+    restart: unless-stopped
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE_URL=sqlite+aiosqlite:///./cipherx.db
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=cipherx-prod-secret-change-in-env-2026
+      - STORAGE_TYPE=local
+      - AI_PROVIDER=deterministic_grounded
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # 2. React SPA Frontend & Reverse Proxy
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    container_name: cipherx-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:80"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+
+  # 3. Asynchronous Worker
+  worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.worker
+    container_name: cipherx-worker
+    restart: unless-stopped
+    depends_on:
+      - backend
+      - redis
+
+  # 4. Redis Cache & Messaging Broker
+  redis:
+    image: redis:7-alpine
+    container_name: cipherx-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  # 5. MinIO S3 Object Storage (Optional artifact repository)
+  minio:
+    image: minio/minio:latest
+    container_name: cipherx-minio
+    restart: unless-stopped
+    environment:
+      - MINIO_ROOT_USER=cipherx_admin
+      - MINIO_ROOT_PASSWORD=CipherXSecurePassword2026!
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+
+volumes:
+  redis_data:
+  minio_data:
