@@ -37,12 +37,20 @@ export function LoginPage() {
       <div style={{ width: '100%', maxWidth: 400 }}>
         {/* Brand */}
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <div style={{
-            width: 56, height: 56, borderRadius: 12, background: 'var(--cx-orange)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px'
-          }}>
-            <ShieldCheck size={28} color="#fff" />
-          </div>
+          <img
+            src="/app-logo.png"
+            alt="Cipher-X Logo"
+            style={{
+              width: 72,
+              height: 72,
+              borderRadius: 16,
+              objectFit: 'contain',
+              margin: '0 auto 16px',
+              display: 'block',
+              boxShadow: '0 0 24px rgba(255, 107, 0, 0.45)',
+              border: '2px solid rgba(255, 107, 0, 0.4)'
+            }}
+          />
           <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--cx-dark-text)', letterSpacing: '0.05em' }}>CIPHER-X</div>
           <div style={{ fontSize: 13, color: 'var(--cx-dark-muted)', marginTop: 4 }}>AI-Powered Network Security Compliance Auditor</div>
         </div>

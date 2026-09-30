@@ -63,18 +63,25 @@ export function Sidebar() {
     <nav className="app-sidebar" aria-label="Main navigation">
       {/* Logo */}
       <div className="sidebar-logo">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{
-            width: 28, height: 28, borderRadius: 6, background: 'var(--cx-orange)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
-          }}>
-            <ShieldCheck size={16} color="#fff" />
-          </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <img
+            src="/app-logo.png"
+            alt="Cipher-X Logo"
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 8,
+              objectFit: 'contain',
+              boxShadow: '0 0 12px rgba(255, 107, 0, 0.35)',
+              border: '1px solid rgba(255, 107, 0, 0.4)',
+              flexShrink: 0
+            }}
+          />
           <div>
-            <div className="sidebar-logo-name">CIPHER-X</div>
+            <div className="sidebar-logo-name" style={{ letterSpacing: '0.05em' }}>CIPHER-X</div>
+            <div className="sidebar-logo-tag" style={{ marginTop: 2 }}>Security Compliance</div>
           </div>
         </div>
-        <div className="sidebar-logo-tag" style={{ marginTop: 4, marginLeft: 36 }}>Security Compliance</div>
       </div>
 
       {/* Navigation sections */}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { Search, Bell, HelpCircle } from 'lucide-react';
+import { Search, Bell, HelpCircle, Film } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 const routeLabels: Record<string, string> = {
@@ -69,6 +69,14 @@ export function Topbar() {
         </div>
         <button className="btn btn-ghost btn-icon" title="Notifications" aria-label="Notifications">
           <Bell size={16} color="var(--cx-dark-muted)" />
+        </button>
+        <button
+          className="btn btn-ghost btn-icon"
+          title="Replay Launch Video (8s Intro)"
+          aria-label="Replay Launch Video"
+          onClick={() => window.dispatchEvent(new CustomEvent('cipherx:replay-intro'))}
+        >
+          <Film size={16} color="var(--cx-orange)" />
         </button>
         <button className="btn btn-ghost btn-icon" title="Help" aria-label="Help">
           <HelpCircle size={16} color="var(--cx-dark-muted)" />

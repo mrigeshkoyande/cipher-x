@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AppShell } from './components/layout/AppShell';
+import { LaunchSplashScreen } from './components/common/LaunchSplashScreen';
 import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { DevicesPage } from './pages/DevicesPage';
@@ -37,31 +38,47 @@ function SettingsPage() {
 }
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    const handleReplay = () => setShowSplash(true);
+    window.addEventListener('cipherx:replay-intro', handleReplay);
+    return () => window.removeEventListener('cipherx:replay-intro', handleReplay);
+  }, []);
+
   return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route element={<AppShell />}>
-        <Route index element={<Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/devices" element={<DevicesPage />} />
-        <Route path="/devices/:id" element={<DeviceDetailPage />} />
-        <Route path="/configurations" element={<ConfigurationsPage />} />
-        <Route path="/configurations/upload" element={<ConfigurationUploadPage />} />
-        <Route path="/configurations/:id" element={<ConfigurationDetailPage />} />
-        <Route path="/compliance" element={<CompliancePage />} />
-        <Route path="/findings" element={<FindingsPage />} />
-        <Route path="/findings/:id" element={<FindingDetailPage />} />
-        <Route path="/remediation" element={<RemediationPage />} />
-        <Route path="/training" element={<TrainingPage />} />
-        <Route path="/security-graph" element={<SecurityGraphPage />} />
-        <Route path="/query" element={<QueryPage />} />
-        <Route path="/simulation" element={<SimulationPage />} />
-        <Route path="/reports" element={<ReportsPage />} />
-        <Route path="/drift" element={<DriftPage />} />
-        <Route path="/audit" element={<AuditPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-      </Route>
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
-    </Routes>
+    <>
+      {showSplash && (
+        <LaunchSplashScreen
+          durationSeconds={8}
+          onComplete={() => setShowSplash(false)}
+        />
+      )}
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route element={<AppShell />}>
+          <Route index element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/devices" element={<DevicesPage />} />
+          <Route path="/devices/:id" element={<DeviceDetailPage />} />
+          <Route path="/configurations" element={<ConfigurationsPage />} />
+          <Route path="/configurations/upload" element={<ConfigurationUploadPage />} />
+          <Route path="/configurations/:id" element={<ConfigurationDetailPage />} />
+          <Route path="/compliance" element={<CompliancePage />} />
+          <Route path="/findings" element={<FindingsPage />} />
+          <Route path="/findings/:id" element={<FindingDetailPage />} />
+          <Route path="/remediation" element={<RemediationPage />} />
+          <Route path="/training" element={<TrainingPage />} />
+          <Route path="/security-graph" element={<SecurityGraphPage />} />
+          <Route path="/query" element={<QueryPage />} />
+          <Route path="/simulation" element={<SimulationPage />} />
+          <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/drift" element={<DriftPage />} />
+          <Route path="/audit" element={<AuditPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </>
   );
 }
