@@ -1,244 +1,292 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Network, Server, FileCode, CheckCircle2, 
-  AlertTriangle, Flame, Terminal, Filter, RefreshCw, ZoomIn, Info
-} from 'lucide-react';
 
 export default function SecurityGraphView({ selectedDeviceId, onNavigateTab }) {
-  const [graphData, setGraphData] = useState({ nodes: [], edges: [] });
-  const [selectedNode, setSelectedNode] = useState(null);
-  const [queryFilter, setQueryFilter] = useState('ALL');
-  const [devices, setDevices] = useState([]);
+  const [graphData, setGraphData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedNode, setSelectedNode] = useState(null);
+  const [filters, setFilters] = useState({
+    layers: ['Device', 'Config', 'Security Fact', 'Control Policy', 'Finding', 'Remediation'],
+    vendor: 'Cisco',
+    severity: 'High',
+  });
 
   useEffect(() => {
     fetchGraph();
-    fetchDevices();
-  }, []);
+  }, [selectedDeviceId]);
 
-  const fetchDevices = async () => {
+  const fetchGraph = async () => {
     try {
-      const res = await fetch('/api/v1/devices');
-      if (res.ok) {
-        const data = await res.json();
-        setDevices(data);
-      }
-    } catch (e) {
-      console.error(e);
-    }
+      const res = await fetch('/api/v1/graph/topology');
+      if (res.ok) setGraphData(await res.json());
+    } catch (e) { console.error(e); }
+    finally { setLoading(false); }
   };
 
-  const fetchGraph = async (deviceId = null) => {
-    setLoading(true);
-    try {
-      const url = deviceId ? `/api/v1/graph/device/${deviceId}` : '/api/v1/graph/full';
-      const res = await fetch(url);
-      if (res.ok) {
-        const data = await res.json();
-        setGraphData(data);
-        if (data.nodes.length > 0) {
-          setSelectedNode(data.nodes[0]);
-        }
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
+  const demoNodes = {
+    device: { hostname: 'Cisco-Core-01', ip: '10.240.0.1', platform: 'Catalyst 9600 Series', vlan: 'VLAN 10,20,50', uptime: '142d' },
+    config: { filename: 'cisco-core-01-running.cfg', version: 'v14.2', sha256: '8f91…c7d2', tokens: 2410 },
+    finding: { controlId: 'CIS-NET-004', title: 'CIS-NET-004 Finding', status: 'FAIL' },
+    causality: [
+      { label: 'Cisco-Core-01', icon: 'dns' },
+      { label: 'Snapshot v14.2', icon: 'description' },
+      { label: 'remote_management.telnet = true', icon: 'code', isCode: true },
+      { label: 'CIS-NET-004', icon: 'gavel' },
+      { label: 'Violation FAIL', icon: 'error', isError: true },
+      { label: 'Remediation CLI', icon: 'terminal' },
+    ],
+    blastRadius: {
+      affected: 3,
+      description: 'Cleartext Telnet exposure allows unencrypted credential interception traversing intermediate transit networks:',
+      devices: [
+        { name: 'Cisco-Dist-Agg-01', ip: '10.240.10.1' },
+        { name: 'Cisco-Dist-Agg-02', ip: '10.240.10.2' },
+        { name: 'Edge-Border-GW-01', ip: '10.240.254.254' },
+      ],
+    },
+    remediation: { id: 'PB-CISCO-SSH-09', description: 'Automatically replaces transport input telnet with transport input ssh across VTY 0 to 15 without terminating active sessions.' },
   };
 
-  const handleDeviceFilterChange = (deviceId) => {
-    if (deviceId === 'ALL') {
-      fetchGraph(null);
-    } else {
-      fetchGraph(deviceId);
-    }
-  };
-
-  const getNodeColor = (type, node) => {
-    switch (type) {
-      case 'Device': return 'from-cyan-500 to-blue-600 border-cyan-400 text-cyan-200';
-      case 'Configuration': return 'from-indigo-600 to-purple-600 border-indigo-400 text-indigo-200';
-      case 'Fact': return 'from-slate-700 to-slate-800 border-slate-600 text-slate-300';
-      case 'Control': return 'from-amber-600 to-orange-600 border-amber-400 text-amber-200';
-      case 'Finding': return 'from-red-600 to-rose-700 border-red-400 text-red-200';
-      case 'Risk': return 'from-rose-700 to-pink-700 border-rose-400 text-rose-200';
-      case 'Remediation': return 'from-emerald-600 to-teal-700 border-emerald-400 text-emerald-200';
-      default: return 'from-slate-800 to-slate-900 border-slate-700 text-slate-300';
-    }
-  };
-
-  const filteredNodes = queryFilter === 'ALL' 
-    ? graphData.nodes 
-    : graphData.nodes.filter(n => n.type === queryFilter);
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div style={{ textAlign: 'center' }}>
+          <div className="loading-spinner"></div>
+          <div className="loading-text">Loading Security Knowledge Graph...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Header & Graph Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="font-heading font-extrabold text-2xl text-slate-100 flex items-center gap-2.5">
-            <Network className="w-6 h-6 text-cyan-400" /> Security Knowledge & Relationship Graph
-          </h2>
-          <p className="text-xs text-slate-400 mt-1">
-            Device ➔ Configuration ➔ Fact ➔ Control ➔ Finding ➔ Risk ➔ Remediation graph ontology.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          {/* Device Filter */}
-          <select
-            onChange={(e) => handleDeviceFilterChange(e.target.value)}
-            className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-400"
-          >
-            <option value="ALL">All Enterprise Graph</option>
-            {devices.map(d => (
-              <option key={d.id} value={d.id}>{d.name}</option>
-            ))}
-          </select>
-
-          {/* Node Type Filter */}
-          <select
-            value={queryFilter}
-            onChange={(e) => setQueryFilter(e.target.value)}
-            className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-400"
-          >
-            <option value="ALL">All Node Types ({graphData.nodes.length})</option>
-            <option value="Device">Devices</option>
-            <option value="Configuration">Configurations</option>
-            <option value="Fact">Facts</option>
-            <option value="Control">Controls</option>
-            <option value="Finding">Findings</option>
-            <option value="Risk">Risks</option>
-            <option value="Remediation">Remediations</option>
-          </select>
+    <div className="animate-in">
+      {/* Header */}
+      <div className="page-header">
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+          <div>
+            <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              Security Knowledge Graph
+              <span className="badge primary">LIVE CAUSAL MAP</span>
+            </h1>
+            <p>
+              Interactive relational topology visualizing the causal compliance chain:
+              <span style={{ color: 'var(--severity-pass)', fontWeight: 600 }}> Device</span> →
+              <span style={{ fontWeight: 600 }}> Configuration Snapshot</span> →
+              <span style={{ color: 'var(--primary)', fontWeight: 600 }}> Normalized Fact</span> →
+              Compliance Control →
+              <span style={{ color: 'var(--severity-critical)', fontWeight: 600 }}> Security Finding</span> →
+              Remediation Action.
+            </p>
+          </div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--on-surface-variant)', display: 'flex', alignItems: 'center', gap: '0.375rem', flexShrink: 0 }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>sync</span>
+            Graph updated 4m ago
+          </div>
         </div>
       </div>
 
-      {/* Main Graph Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left: Interactive Graph Topology Canvas (8 cols) */}
-        <div className="lg:col-span-8 glass-panel p-5 min-h-[550px] flex flex-col justify-between relative overflow-hidden">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-800 text-xs text-slate-400">
-            <div className="flex items-center gap-4">
-              <span className="font-mono">Nodes: <strong className="text-cyan-400">{filteredNodes.length}</strong></span>
-              <span className="font-mono">Edges: <strong className="text-blue-400">{graphData.edges.length}</strong></span>
+      {/* Layer Filters */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
+        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--on-surface-variant)' }}>ACTIVE LAYERS:</span>
+        {filters.layers.map((layer, i) => {
+          const colors = ['var(--severity-pass)', '#555', 'var(--primary)', 'var(--severity-info)', 'var(--severity-critical)', 'var(--severity-medium)'];
+          return (
+            <span key={i} className="filter-chip active" style={{ borderColor: colors[i], background: `${colors[i]}15` }}>
+              <span className="status-dot" style={{ background: colors[i] }}></span>
+              {layer}
+            </span>
+          );
+        })}
+      </div>
+
+      {/* Vendor/Severity Filter Bar */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--on-surface-variant)' }}>VENDOR:</span>
+        <select style={{ padding: '0.25rem 0.5rem', border: '1px solid var(--outline-variant)', borderRadius: 'var(--radius-md)', background: 'var(--surface-container-low)', fontSize: '0.8125rem', fontFamily: 'inherit' }}>
+          <option>Cisco</option>
+          <option>Juniper</option>
+          <option>Fortinet</option>
+          <option>Palo Alto</option>
+        </select>
+        <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--on-surface-variant)' }}>SEVERITY:</span>
+        <select style={{ padding: '0.25rem 0.5rem', border: '1px solid var(--outline-variant)', borderRadius: 'var(--radius-md)', background: 'var(--surface-container-low)', fontSize: '0.8125rem', fontFamily: 'inherit' }}>
+          <option>High</option>
+          <option>Critical</option>
+          <option>Medium</option>
+          <option>Low</option>
+        </select>
+        <div className="topbar-search" style={{ maxWidth: 250 }}>
+          <span className="material-symbols-outlined">search</span>
+          <input type="text" placeholder="Cisco-Core-01" defaultValue="Cisco-Core-01" />
+        </div>
+      </div>
+
+      {/* Graph Content + Side Panel */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '1rem' }}>
+        {/* Graph Canvas Area */}
+        <div className="info-card" style={{ minHeight: 500, position: 'relative' }}>
+          {/* Tier Headers */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--surface-variant)' }}>
+            <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--on-surface-variant)' }}>TIER 1: DEVICE NODE <span style={{ marginLeft: '0.5rem' }}>N=1</span></span>
+            <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--on-surface-variant)' }}>TIER 2: CONFIG SNAPSHOT <span style={{ marginLeft: '0.5rem' }}>N=1</span></span>
+            <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--on-surface-variant)' }}>TIER 3: FACTS</span>
+          </div>
+
+          {/* Device Node */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div className="stat-card" style={{ maxWidth: 280, borderColor: 'var(--severity-pass)', borderWidth: 2 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                <span className="badge pass" style={{ fontSize: '0.5625rem' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 12 }}>dns</span>
+                  CORE SWITCH
+                </span>
+                <span className="status-dot green" style={{ marginLeft: 'auto' }}></span>
+              </div>
+              <div style={{ fontWeight: 800, fontSize: '1.125rem' }}>{demoNodes.device.hostname}</div>
+              <div style={{ fontSize: '0.75rem', color: 'var(--on-surface-variant)', fontFamily: "'JetBrains Mono', monospace" }}>
+                IP: {demoNodes.device.ip}<br />{demoNodes.device.platform}
+              </div>
+              <div style={{ marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid var(--surface-variant)', display: 'flex', justifyContent: 'space-between', fontSize: '0.6875rem', color: 'var(--on-surface-variant)' }}>
+                <span>{demoNodes.device.vlan}</span>
+                <span>UPTIME: {demoNodes.device.uptime}</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2 text-[11px] font-mono">
-              <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 inline-block"></span> Device
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block ml-2"></span> Control
-              <span className="w-2.5 h-2.5 rounded-full bg-red-400 inline-block ml-2"></span> Finding
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block ml-2"></span> Fix
+
+            {/* Arrow */}
+            <div style={{ display: 'flex', alignItems: 'center', padding: '0 0.5rem' }}>
+              <div style={{ width: 60, height: 2, background: 'var(--outline-variant)', position: 'relative' }}>
+                <div style={{ position: 'absolute', right: -4, top: -4, borderTop: '5px solid transparent', borderBottom: '5px solid transparent', borderLeft: '8px solid var(--outline-variant)' }}></div>
+              </div>
+            </div>
+
+            {/* Config Snapshot Node */}
+            <div className="stat-card" style={{ maxWidth: 280 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                <span className="badge neutral" style={{ fontSize: '0.5625rem' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 12 }}>description</span>
+                  CFG SNAPSHOT
+                </span>
+                <span className="badge neutral" style={{ fontSize: '0.5625rem', marginLeft: 'auto' }}>v14.2</span>
+              </div>
+              <div style={{ fontWeight: 700, fontSize: '1rem' }}>{demoNodes.config.filename}</div>
+              <div className="hash-value" style={{ marginTop: '0.5rem', width: '100%', justifyContent: 'space-between' }}>
+                SHA256: {demoNodes.config.sha256}
+                <button className="topbar-icon-btn" style={{ width: 20, height: 20 }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 14 }}>content_copy</span>
+                </button>
+              </div>
+              <div style={{ marginTop: '0.375rem', fontSize: '0.6875rem', color: 'var(--on-surface-variant)' }}>
+                Parsed {demoNodes.config.tokens} AST tokens
+              </div>
             </div>
           </div>
 
-          {/* Node Grid Layout */}
-          <div className="my-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-[440px] overflow-y-auto p-2">
-            {filteredNodes.map((n) => {
-              const isSelected = selectedNode?.id === n.id;
-              const colorClass = getNodeColor(n.type, n);
-              return (
-                <div
-                  key={n.id}
-                  onClick={() => setSelectedNode(n)}
-                  className={`p-3 rounded-xl border bg-gradient-to-br cursor-pointer transition transform hover:-translate-y-1 ${colorClass} ${
-                    isSelected ? 'ring-2 ring-cyan-400 shadow-lg shadow-cyan-500/30' : 'opacity-90 hover:opacity-100'
-                  }`}
-                >
-                  <div className="text-[9px] font-mono uppercase font-bold tracking-wider opacity-80 mb-1">
-                    {n.type}
-                  </div>
-                  <div className="font-heading font-bold text-xs line-clamp-2 text-white">
-                    {n.label || n.title || n.id}
-                  </div>
-                  {n.severity && (
-                    <div className="mt-2 text-[9px] font-mono font-bold uppercase">
-                      {n.severity}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Quick Relationship Query Shortcuts */}
-          <div className="pt-3 border-t border-slate-800/80 flex flex-wrap items-center gap-2 text-xs">
-            <span className="text-slate-500 font-mono text-[11px]">Relationship Queries:</span>
-            <button 
-              onClick={() => handleDeviceFilterChange('dev-cisco-core-01')}
-              className="px-2 py-1 rounded bg-slate-900 border border-slate-700 text-cyan-300 hover:border-cyan-400 text-[11px]"
-            >
-              Show everything affected by Cisco Core
-            </button>
-            <button 
-              onClick={() => setQueryFilter('Finding')}
-              className="px-2 py-1 rounded bg-slate-900 border border-slate-700 text-red-300 hover:border-red-400 text-[11px]"
-            >
-              Show all active findings
-            </button>
+          {/* Graph Status Bar */}
+          <div style={{ position: 'absolute', bottom: '1rem', left: '1rem', right: '1rem', display: 'flex', alignItems: 'center', gap: '1.5rem', padding: '0.625rem 1rem', background: 'var(--surface-container)', borderRadius: 'var(--radius-md)', fontSize: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 16 }}>hub</span>
+              <strong>GRAPH STATUS</strong>
+            </div>
+            <span>14 Active Relations · 2 Severe Paths</span>
+            <div style={{ display: 'flex', gap: '1rem', marginLeft: 'auto' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><span style={{ width: 16, height: 2, background: 'var(--on-surface)' }}></span>Verified Causality</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><span style={{ width: 16, height: 2, background: 'var(--severity-critical)' }}></span>Violation Link</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}><span style={{ width: 16, height: 2, background: 'var(--primary)' }}></span>Normalized Fact</span>
+            </div>
           </div>
         </div>
 
-        {/* Right: Selected Node Properties & Impact Path (4 cols) */}
-        <div className="lg:col-span-4 glass-panel p-5 space-y-4">
-          {selectedNode ? (
-            <div className="space-y-4">
-              <div className="border-b border-slate-800 pb-3">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-slate-800 text-cyan-300 uppercase font-bold">
-                    {selectedNode.type} NODE
+        {/* Inspection Sidecar */}
+        <div>
+          <div className="info-card">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+              <div>
+                <div style={{ fontSize: '0.625rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--on-surface-variant)', letterSpacing: '0.04em', marginBottom: '0.25rem' }}>INSPECTION SIDECAR</div>
+                <div style={{ fontWeight: 700, fontSize: '1rem' }}>Node Inspector: CIS-NET-004 Finding</div>
+              </div>
+              <span className="badge fail">FAIL</span>
+            </div>
+
+            {/* Causal Chain */}
+            <div style={{ marginBottom: '1rem' }}>
+              <div style={{ fontSize: '0.625rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--on-surface-variant)', letterSpacing: '0.04em', marginBottom: '0.5rem' }}>CAUSAL PROPAGATION CHAIN</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', paddingLeft: '0.5rem', borderLeft: '2px solid var(--outline-variant)' }}>
+                {demoNodes.causality.map((node, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.25rem 0', paddingLeft: '0.5rem' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 16, color: node.isError ? 'var(--severity-critical)' : 'var(--on-surface-variant)' }}>{node.icon}</span>
+                    {node.isCode ? (
+                      <span className="code-tag" style={{ fontSize: '0.6875rem' }}>{node.label}</span>
+                    ) : (
+                      <span style={{ fontSize: '0.8125rem', fontWeight: node.isError ? 700 : 500, color: node.isError ? 'var(--severity-critical)' : 'var(--on-surface)' }}>{node.label}</span>
+                    )}
+                    {i < demoNodes.causality.length - 1 && <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: 'var(--outline)' }}>→</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Blast Radius */}
+            <div style={{ marginBottom: '1rem' }}>
+              <div style={{ fontSize: '0.625rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--on-surface-variant)', letterSpacing: '0.04em', marginBottom: '0.5rem' }}>BLAST RADIUS ASSESSMENT</div>
+              <div className="alert warning" style={{ marginBottom: '0.5rem' }}>
+                <span className="material-symbols-outlined">warning</span>
+                <div>
+                  <div style={{ fontWeight: 700 }}>{demoNodes.blastRadius.affected} Affected Downstream Devices</div>
+                  <div style={{ fontSize: '0.75rem' }}>{demoNodes.blastRadius.description}</div>
+                </div>
+              </div>
+              {demoNodes.blastRadius.devices.map((dev, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.25rem 0', fontSize: '0.8125rem' }}>
+                  <span>• {dev.name}</span>
+                  <span className="code-tag" style={{ fontSize: '0.625rem' }}>{dev.ip}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Upstream Evidence */}
+            <div style={{ marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.375rem' }}>
+                <span style={{ fontSize: '0.625rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--on-surface-variant)', letterSpacing: '0.04em' }}>UPSTREAM EVIDENCE</span>
+                <span style={{ fontSize: '0.625rem', color: 'var(--on-surface-variant)' }}>Line 142 of running config</span>
+              </div>
+              <div className="code-block">
+                <div style={{ opacity: 0.6 }}># /mnt/configs/cisco-core-01-running.cfg</div>
+                <div>140: line vty 0 4</div>
+                <div>141: exec-timeout 15 0</div>
+                <div style={{ background: 'rgba(211, 47, 47, 0.3)', padding: '0 0.25rem', borderRadius: 2 }}>142: transport input telnet</div>
+                <div>143: transport output none</div>
+                <div>144: stopbits 1</div>
+              </div>
+              <button style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', marginTop: '0.375rem', fontSize: '0.6875rem', color: 'var(--primary)', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', marginLeft: 'auto' }}>
+                View Full Forensic Snapshot
+                <span className="material-symbols-outlined" style={{ fontSize: 14 }}>open_in_new</span>
+              </button>
+            </div>
+
+            {/* Target Action Plan */}
+            <div>
+              <div style={{ fontSize: '0.625rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--on-surface-variant)', letterSpacing: '0.04em', marginBottom: '0.5rem' }}>TARGET ACTION PLAN</div>
+              <div className="stat-card" style={{ marginBottom: '0.75rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 16, color: 'var(--severity-pass)' }}>check_circle</span>
+                    <span style={{ fontWeight: 600 }}>Playbook Verified</span>
                   </span>
-                  <span className="font-mono text-xs text-slate-500">{selectedNode.id}</span>
+                  <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '0.6875rem', color: 'var(--on-surface-variant)' }}>Id: {demoNodes.remediation.id}</span>
                 </div>
-                <h3 className="font-heading font-bold text-base text-slate-100">{selectedNode.label || selectedNode.id}</h3>
-              </div>
-
-              {/* Node Attributes */}
-              <div className="space-y-2">
-                <h5 className="text-xs font-mono text-slate-400 uppercase font-semibold">Node Attributes</h5>
-                <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 font-mono text-xs space-y-2">
-                  {Object.entries(selectedNode).map(([k, v]) => {
-                    if (k === 'id' || k === 'label') return null;
-                    return (
-                      <div key={k} className="flex justify-between items-center text-slate-300 border-b border-slate-900 pb-1">
-                        <span className="text-slate-500">{k}:</span>
-                        <strong className="text-cyan-300 text-right max-w-[180px] truncate">{String(v)}</strong>
-                      </div>
-                    );
-                  })}
+                <div style={{ fontSize: '0.8125rem', color: 'var(--on-surface-variant)', marginTop: '0.375rem' }}>
+                  {demoNodes.remediation.description}
                 </div>
               </div>
-
-              {/* Connected Edges */}
-              <div className="space-y-2">
-                <h5 className="text-xs font-mono text-slate-400 uppercase font-semibold">Connected Relationships</h5>
-                <div className="space-y-1.5 max-h-48 overflow-y-auto">
-                  {graphData.edges
-                    .filter(e => e.source === selectedNode.id || e.target === selectedNode.id)
-                    .map((edge, idx) => (
-                      <div key={idx} className="p-2 rounded bg-slate-900/60 border border-slate-800 text-[11px] font-mono flex items-center justify-between">
-                        <span className="text-slate-400">{edge.source === selectedNode.id ? '➔ TARGET' : '⬅ SOURCE'}</span>
-                        <span className="text-cyan-400 font-bold">{edge.relation}</span>
-                        <span className="text-slate-300 truncate max-w-[100px]">{edge.source === selectedNode.id ? edge.target : edge.source}</span>
-                      </div>
-                    ))}
-                </div>
+              <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 18 }}>play_arrow</span>
+                Trigger Auto-Remediation Playbook
+              </button>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem' }}>
+                <button style={{ background: 'none', border: 'none', color: 'var(--on-surface-variant)', cursor: 'pointer', fontSize: '0.75rem', fontFamily: 'inherit' }}>Dismiss Finding</button>
+                <button style={{ background: 'none', border: 'none', color: 'var(--on-surface-variant)', cursor: 'pointer', fontSize: '0.75rem', fontFamily: 'inherit' }}>Create Jira Ticket</button>
               </div>
-
-              {selectedNode.type === 'Finding' && (
-                <button
-                  onClick={() => onNavigateTab && onNavigateTab('remediation')}
-                  className="btn-cyber-primary w-full justify-center text-xs"
-                >
-                  View Remediation Playbook
-                </button>
-              )}
             </div>
-          ) : (
-            <div className="text-center py-20 text-slate-500 text-xs">
-              Select any graph node to inspect ontology relationships
-            </div>
-          )}
+          </div>
         </div>
       </div>
     </div>
