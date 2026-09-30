@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CIPHER-X | Configuration Drift Center</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Hanken Grotesk & JetBrains Mono -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300..900;1,300..900&amp;family=JetBrains+Mono:ital,wght@0,400..700;1,400..700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration Verbatim -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-secondary-fixed": "#0b2000",
+            "on-primary-fixed-variant": "#683d00",
+            "on-tertiary-fixed": "#1f1c0e",
+            "secondary-fixed": "#cbedad",
+            "secondary": "#4a6633",
+            "on-secondary-fixed-variant": "#334e1e",
+            "surface-container-highest": "#dee5d5",
+            "secondary-fixed-dim": "#b0d193",
+            "surface-container": "#eaf0e0",
+            "primary-container": "#f4991a",
+            "outline": "#867462",
+            "on-primary-fixed": "#2c1700",
+            "on-error-container": "#93000a",
+            "inverse-primary": "#ffb869",
+            "surface-container-high": "#e4eada",
+            "on-error": "#ffffff",
+            "on-background": "#171d13",
+            "tertiary-fixed-dim": "#cdc6b0",
+            "surface-container-low": "#f0f6e5",
+            "surface": "#f5fceb",
+            "surface-bright": "#f5fceb",
+            "error": "#ba1a1a",
+            "on-tertiary-fixed-variant": "#4b4736",
+            "on-tertiary": "#ffffff",
+            "surface-variant": "#dee5d5",
+            "on-secondary": "#ffffff",
+            "background": "#f5fceb",
+            "primary-fixed-dim": "#ffb869",
+            "on-surface": "#171d13",
+            "primary-fixed": "#ffdcbb",
+            "secondary-container": "#c8eaaa",
+            "surface-tint": "#885200",
+            "inverse-on-surface": "#edf3e3",
+            "outline-variant": "#d9c3ae",
+            "on-primary-container": "#603800",
+            "on-tertiary-container": "#464231",
+            "tertiary-container": "#b4ae99",
+            "on-surface-variant": "#544434",
+            "tertiary-fixed": "#eae2cb",
+            "primary": "#885200",
+            "surface-container-lowest": "#ffffff",
+            "surface-dim": "#d6dccc",
+            "inverse-surface": "#2c3227",
+            "on-primary": "#ffffff",
+            "error-container": "#ffdad6",
+            "tertiary": "#635e4c",
+            "on-secondary-container": "#4e6b37"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-xs": "0.25rem",
+            "margin-tablet": "1.5rem",
+            "space-md": "0.75rem",
+            "space-lg": "1rem",
+            "space-sm": "0.5rem",
+            "gutter-desktop": "1.5rem",
+            "margin": "1rem",
+            "space-3xl": "3rem",
+            "gutter": "1rem",
+            "space-2xl": "2rem",
+            "margin-desktop": "2rem",
+            "space-xl": "1.5rem",
+            "space-2xs": "0.125rem"
+          },
+          "fontFamily": {
+            "headline-md": ["Hanken Grotesk"],
+            "body-lg": ["Hanken Grotesk"],
+            "headline-lg-mobile": ["Hanken Grotesk"],
+            "label-code-md": ["JetBrains Mono"],
+            "headline-sm": ["Hanken Grotesk"],
+            "headline-xl": ["Hanken Grotesk"],
+            "label-code-sm": ["JetBrains Mono"],
+            "caption-caps": ["Hanken Grotesk"],
+            "body-sm": ["Hanken Grotesk"],
+            "body-md": ["Hanken Grotesk"],
+            "headline-lg": ["Hanken Grotesk"],
+            "headline-xl-mobile": ["Hanken Grotesk"]
+          },
+          "fontSize": {
+            "headline-md": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "headline-lg-mobile": ["20px", { "lineHeight": "26px", "fontWeight": "600" }],
+            "label-code-md": ["13px", { "lineHeight": "18px", "fontWeight": "500" }],
+            "headline-sm": ["15px", { "lineHeight": "20px", "fontWeight": "600" }],
+            "headline-xl": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+            "label-code-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+            "caption-caps": ["10px", { "lineHeight": "12px", "fontWeight": "700" }],
+            "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+            "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+            "headline-xl-mobile": ["26px", { "lineHeight": "32px", "fontWeight": "700" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    /* Subtle custom scrollbar for forensic terminal inspection */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #171d13;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #544434;
+      border-radius: 2px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #867462;
+    }
+  </style>
+</head>
+<body class="bg-[#F9F5F0] text-on-surface antialiased flex min-h-screen">
+<!-- ========================================================================= -->
+<!-- SHARED COMPONENT 1: Persistent SideNavBar (Authority: Deep Forest Green)   -->
+<!-- ========================================================================= -->
+<aside class="fixed top-0 left-0 h-screen w-64 flex flex-col justify-between bg-[#344F1F] text-on-secondary border-r border-outline-variant/30 shadow-sm z-40 select-none">
+<!-- Top Branding & CTA Section -->
+<div class="px-space-md pt-space-lg flex flex-col">
+<!-- Shield Header Branding -->
+<div class="flex items-center gap-3 px-2 mb-space-lg">
+<div class="w-9 h-9 rounded-lg bg-surface-container-lowest/15 flex items-center justify-center border border-white/20 text-primary-container shadow-inner">
+<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+</div>
+<div class="flex flex-col">
+<span class="text-headline-md font-headline-md font-bold text-white tracking-wider leading-none">Cipher-X</span>
+<span class="text-label-code-sm font-label-code-sm text-secondary-fixed-dim/90 tracking-tight mt-1">AI Compliance Auditor</span>
+</div>
+</div>
+<!-- Global Audit CTA Button -->
+<button class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-primary-container hover:bg-primary-container/90 text-on-secondary-fixed font-headline-sm transition duration-150 ease-in-out shadow-sm border border-outline-variant/40 mb-space-md">
+<span class="material-symbols-outlined text-[18px]">bolt</span>
+<span>Trigger Audit</span>
+</button>
+<div class="text-caption-caps font-caption-caps tracking-widest text-secondary-fixed-dim/60 px-3 pb-1 uppercase">Main Ecosystem</div>
+</div>
+<!-- Navigation Scrollable Rail -->
+<div class="flex-1 overflow-y-auto px-space-md py-1 space-y-0.5">
+<!-- Overview -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">dashboard</span>
+<span>Overview</span>
+</a>
+<!-- Devices -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">router</span>
+<span>Devices</span>
+</a>
+<!-- Configurations -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">terminal</span>
+<span>Configurations</span>
+</a>
+<!-- Compliance -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">verified_user</span>
+<span>Compliance</span>
+</a>
+<!-- Findings -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">rule</span>
+<span>Findings</span>
+</a>
+<!-- Training Studio -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">model_training</span>
+<span>Training Studio</span>
+</a>
+<!-- ACTIVE NAVIGATION: Drift -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-surface-container-lowest/10 text-on-secondary font-headline-sm border-l-2 border-primary-container" href="#">
+<span class="material-symbols-outlined text-[19px] text-primary-container" style="font-variation-settings: 'FILL' 1;">compare_arrows</span>
+<span class="flex-1">Drift</span>
+<span class="px-1.5 py-0.5 rounded-full text-caption-caps font-caption-caps bg-primary-container text-on-secondary-fixed font-bold">3</span>
+</a>
+<!-- Reports -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">assessment</span>
+<span>Reports</span>
+</a>
+<!-- Security Graph -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">hub</span>
+<span>Security Graph</span>
+</a>
+<!-- Query -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">manage_search</span>
+<span>Query</span>
+</a>
+<div class="pt-3 pb-1 text-caption-caps font-caption-caps tracking-widest text-secondary-fixed-dim/60 px-3 uppercase">Governance</div>
+<!-- Frameworks & Rules -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">policy</span>
+<span>Frameworks &amp; Rules</span>
+</a>
+<!-- Mappings -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">alt_route</span>
+<span>Mappings</span>
+</a>
+<!-- Audit Trail -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">image_search</span>
+<span>Audit Trail</span>
+</a>
+<!-- System Status -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">check_circle</span>
+<span>System Status</span>
+</a>
+</div>
+<!-- Persistent Footer Nav & Profile -->
+<div class="px-space-md pb-space-lg pt-space-xs border-t border-white/10 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">help</span>
+<span>Help</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">settings</span>
+<span>Settings</span>
+</a>
+<div class="mt-2 pt-2 border-t border-white/10 flex items-center justify-between px-2">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-full bg-secondary-fixed-dim flex items-center justify-center text-on-secondary-fixed">
+<span class="material-symbols-outlined text-[18px]">account_circle</span>
+</div>
+<div class="flex flex-col">
+<span class="text-body-sm font-headline-sm text-white leading-tight">Security Analyst</span>
+<span class="text-label-code-sm font-label-code-sm text-secondary-fixed-dim/70 text-[10px]">Tier-3 SecOps</span>
+</div>
+</div>
+<button class="text-secondary-fixed-dim hover:text-white transition-colors" title="Sign Out">
+<span class="material-symbols-outlined text-[18px]">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- ========================================================================= -->
+<!-- MAIN WORKSPACE CANVAS                                                      -->
+<!-- ========================================================================= -->
+<div class="flex-1 flex flex-col min-h-screen pl-64 bg-[#F9F5F0]">
+<!-- ======================================================================= -->
+<!-- SHARED COMPONENT 2: TopNavBar                                           -->
+<!-- ======================================================================= -->
+<header class="sticky top-0 z-30 bg-surface-container-lowest border-b border-outline-variant/50 shadow-[0_1px_3px_rgba(26,32,22,0.04)] px-margin-desktop py-space-sm flex justify-between items-center">
+<!-- Breadcrumb & Cluster Identifiers -->
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 text-headline-sm font-headline-sm">
+<span class="text-on-surface-variant font-medium">Cipher-X</span>
+<span class="text-outline-variant">/</span>
+<span class="text-secondary font-headline-sm font-bold flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px] text-primary-container">compare_arrows</span>
+            Drift Center
+          </span>
+</div>
+<!-- Target Environment Pill Selector -->
+<div class="flex items-center gap-1.5 bg-[#F2EAD3] border border-[#D8CEB9] px-2.5 py-1 rounded-full text-label-code-sm font-label-code-sm text-on-surface">
+<span class="w-2 h-2 rounded-full bg-[#344F1F] animate-pulse"></span>
+<span class="font-semibold">Production-US-East</span>
+<span class="material-symbols-outlined text-[14px] text-tertiary">arrow_drop_down</span>
+</div>
+</div>
+<!-- Action Cluster -->
+<div class="flex items-center gap-3">
+<!-- Search bar within TopNavBar on right -->
+<div class="relative hidden xl:block">
+<span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-[16px] text-tertiary">search</span>
+<input class="pl-8 pr-3 py-1 bg-[#FFFFFF] border border-[#D8CEB9] rounded text-body-sm font-body-sm text-on-surface placeholder:text-outline/70 focus:outline-none focus:ring-1 focus:ring-secondary w-60" placeholder="Filter device / hash / rule..." type="text"/>
+</div>
+<!-- Secondary Action -->
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded bg-surface-container-lowest hover:bg-surface-container text-on-surface border border-outline-variant font-headline-sm text-body-sm transition duration-150">
+<span class="material-symbols-outlined text-[16px]">file_download</span>
+<span>Export Report</span>
+</button>
+<!-- Primary CTA: Compare Config Versions -->
+<button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded bg-primary-container hover:bg-[#DF860D] text-on-secondary-fixed font-headline-sm text-body-sm transition duration-150 shadow-sm border border-[#DF860D]">
+<span class="material-symbols-outlined text-[16px]">difference</span>
+<span>Compare Config Versions</span>
+</button>
+<!-- Trailing Utility Icons -->
+<div class="flex items-center gap-1 pl-2 border-l border-outline-variant/40 text-on-surface-variant">
+<button class="p-1.5 hover:bg-surface-container rounded transition-colors" title="Notifications">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<button class="p-1.5 hover:bg-surface-container rounded transition-colors" title="Help">
+<span class="material-symbols-outlined text-[20px]">help</span>
+</button>
+<button class="p-1.5 hover:bg-surface-container rounded transition-colors" title="Settings / Tune">
+<span class="material-symbols-outlined text-[20px]">tune</span>
+</button>
+</div>
+</div>
+</header>
+<!-- ======================================================================= -->
+<!-- MAIN WORKSPACE CONTENT CANVAS                                           -->
+<!-- ======================================================================= -->
+<main class="p-margin-desktop space-y-margin-desktop flex-1">
+<!-- Header Title Dossier Block -->
+<section class="border-b border-[#E5DCC9] pb-space-lg flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="px-2 py-0.5 rounded text-caption-caps font-caption-caps tracking-wider uppercase bg-[#F2EAD3] border border-[#D8CEB9] text-[#344F1F]">Forensic Ledger #DFT-2024-884</span>
+<span class="text-label-code-sm font-label-code-sm text-tertiary">Continuous Telemetry Check</span>
+</div>
+<h1 class="text-headline-xl font-headline-xl text-on-surface tracking-tight">Configuration Drift Center</h1>
+<p class="text-body-md font-body-md text-on-surface-variant max-w-4xl mt-1">
+            Detect and trace unauthorized configuration modifications, security posture regressions, and newly introduced regulatory violations between baseline and running states.
+          </p>
+</div>
+<!-- Telemetry Recency Timestamp -->
+<div class="flex items-center gap-2 bg-surface-container-lowest border border-[#E5DCC9] px-3 py-2 rounded text-body-sm shadow-[0_1px_3px_rgba(26,32,22,0.04)] self-start md:self-auto">
+<span class="material-symbols-outlined text-[#344F1F] text-[18px]">sync</span>
+<div class="flex flex-col">
+<span class="text-caption-caps font-caption-caps uppercase text-tertiary">Fleet Ingestion</span>
+<span class="text-label-code-sm font-label-code-sm font-bold text-on-surface">6 hours ago (Automated Ingest)</span>
+</div>
+</div>
+</section>
+<!-- ======================================================================= -->
+<!-- SUMMARY METRICS ROW (Archival Precision Cards)                         -->
+<!-- ======================================================================= -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter-desktop">
+<!-- Card 1: Devices With Drift -->
+<div class="bg-surface-container-lowest border border-[#E5DCC9] rounded-lg p-space-lg shadow-[0_1px_3px_rgba(26,32,22,0.04)] relative overflow-hidden flex flex-col justify-between">
+<div class="absolute top-0 left-0 w-1.5 h-full bg-primary-container"></div>
+<div>
+<div class="flex items-center justify-between text-tertiary mb-1">
+<span class="text-caption-caps font-caption-caps uppercase tracking-wider">Devices With Drift</span>
+<span class="material-symbols-outlined text-[18px] text-primary-container">router</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-headline-xl font-headline-xl text-on-surface">3</span>
+<span class="text-body-md font-body-md text-on-surface-variant font-medium">of 128 Fleet</span>
+</div>
+</div>
+<div class="mt-space-md pt-2 border-t border-[#F2EAD3] space-y-1">
+<span class="text-caption-caps font-caption-caps text-tertiary uppercase">Impacting Nodes:</span>
+<div class="flex flex-wrap gap-1">
+<span class="px-1.5 py-0.5 rounded bg-[#FEF4E6] border border-[#F4991A] text-[#945806] text-label-code-sm font-label-code-sm">Cisco-Core-01</span>
+<span class="px-1.5 py-0.5 rounded bg-[#FAF7F2] border border-[#E5DCC9] text-on-surface-variant text-label-code-sm font-label-code-sm">Aruba-Access-12</span>
+<span class="px-1.5 py-0.5 rounded bg-[#FAF7F2] border border-[#E5DCC9] text-on-surface-variant text-label-code-sm font-label-code-sm">FortiGate-DC-01</span>
+</div>
+</div>
+</div>
+<!-- Card 2: New Violations Introduced -->
+<div class="bg-surface-container-lowest border border-[#E5DCC9] rounded-lg p-space-lg shadow-[0_1px_3px_rgba(26,32,22,0.04)] relative overflow-hidden flex flex-col justify-between">
+<div class="absolute top-0 left-0 w-1.5 h-full bg-error"></div>
+<div>
+<div class="flex items-center justify-between text-tertiary mb-1">
+<span class="text-caption-caps font-caption-caps uppercase tracking-wider">New Violations Introduced</span>
+<span class="material-symbols-outlined text-[18px] text-error">gpp_bad</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-headline-xl font-headline-xl text-error font-bold">+2</span>
+<span class="text-body-sm font-body-sm font-semibold text-error px-1.5 py-0.5 rounded bg-[#F9E6E4]">High Severity</span>
+</div>
+</div>
+<div class="mt-space-md pt-2 border-t border-[#F2EAD3] text-body-sm text-on-surface-variant space-y-0.5">
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+<span class="text-label-code-sm font-label-code-sm font-medium">CIS-NET-004 Telnet enabled</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+<span class="text-label-code-sm font-label-code-sm font-medium">DISA-NET-021 Cleartext Web</span>
+</div>
+</div>
+</div>
+<!-- Card 3: Posture Impact -->
+<div class="bg-surface-container-lowest border border-[#E5DCC9] rounded-lg p-space-lg shadow-[0_1px_3px_rgba(26,32,22,0.04)] relative overflow-hidden flex flex-col justify-between">
+<div class="absolute top-0 left-0 w-1.5 h-full bg-[#DF860D]"></div>
+<div>
+<div class="flex items-center justify-between text-tertiary mb-1">
+<span class="text-caption-caps font-caption-caps uppercase tracking-wider">Posture Impact</span>
+<span class="material-symbols-outlined text-[18px] text-primary-container">trending_down</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-headline-xl font-headline-xl text-[#945806] font-bold">-4.2%</span>
+<span class="text-body-md font-body-md text-on-surface-variant font-medium">Compliance Drop</span>
+</div>
+</div>
+<div class="mt-space-md pt-2 border-t border-[#F2EAD3]">
+<div class="w-full bg-[#FAF7F2] h-2 rounded-full overflow-hidden border border-[#E5DCC9]">
+<div class="bg-[#344F1F] h-full" style="width: 91.8%"></div>
+</div>
+<div class="flex justify-between items-center mt-1 text-label-code-sm font-label-code-sm text-tertiary">
+<span>Current: 91.8%</span>
+<span>Baseline: 96.0%</span>
+</div>
+</div>
+</div>
+<!-- Card 4: Fleet Baseline Verification -->
+<div class="bg-surface-container-lowest border border-[#E5DCC9] rounded-lg p-space-lg shadow-[0_1px_3px_rgba(26,32,22,0.04)] relative overflow-hidden flex flex-col justify-between">
+<div class="absolute top-0 left-0 w-1.5 h-full bg-[#344F1F]"></div>
+<div>
+<div class="flex items-center justify-between text-tertiary mb-1">
+<span class="text-caption-caps font-caption-caps uppercase tracking-wider">Golden Master Status</span>
+<span class="material-symbols-outlined text-[18px] text-[#344F1F]">verified</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-headline-md font-headline-md text-[#344F1F]">v14.1 Fleet Tag</span>
+</div>
+<div class="text-body-sm font-body-sm text-on-surface-variant mt-1">
+              Deterministic GitOps mirror synced.
+            </div>
+</div>
+<div class="mt-space-md pt-2 border-t border-[#F2EAD3] flex justify-between items-center">
+<span class="text-caption-caps font-caption-caps uppercase text-tertiary">Hash Integrity</span>
+<span class="text-label-code-sm font-label-code-sm bg-[#E7EFE0] text-[#344F1F] px-1.5 py-0.5 rounded border border-[#344F1F]/30 font-semibold">SHA256: 4a9f...b78</span>
+</div>
+</div>
+</section>
+<!-- ======================================================================= -->
+<!-- TARGET DEVICE INSPECTION & DIFF VIEWER                                  -->
+<!-- ======================================================================= -->
+<section class="bg-surface-container-lowest border border-[#E5DCC9] rounded-lg shadow-[0_1px_3px_rgba(26,32,22,0.04)] overflow-hidden">
+<!-- Inspection Header for Cisco-Core-01 -->
+<div class="bg-[#F2EAD3] px-space-lg py-3 border-b border-[#D8CEB9] flex flex-wrap items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<span class="p-2 rounded bg-surface-container-lowest border border-[#D8CEB9] text-[#344F1F]">
+<span class="material-symbols-outlined text-[22px]">dns</span>
+</span>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-headline-md font-headline-md text-on-surface">Target Device: Cisco-Core-01</span>
+<span class="text-body-sm font-body-sm text-tertiary">(Catalyst 9600 Backbone)</span>
+<span class="px-2 py-0.5 rounded text-label-code-sm font-label-code-sm bg-surface-container-lowest border border-[#D8CEB9] text-on-surface-variant">10.240.4.1</span>
+</div>
+<div class="flex items-center gap-2 mt-0.5 text-label-code-sm font-label-code-sm text-on-surface-variant">
+<span>Baseline: <strong class="text-on-surface">v14.1 (Oct 18, 08:00 UTC)</strong></span>
+<span class="text-outline-variant">•</span>
+<span>Running: <strong class="text-error">v14.2 (Oct 18, 14:15 UTC)</strong></span>
+</div>
+</div>
+</div>
+<!-- Drift Warning Badge -->
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FEF4E6] border border-[#F4991A] shadow-sm">
+<span class="w-2.5 h-2.5 rounded-full bg-[#F4991A] animate-ping"></span>
+<span class="text-caption-caps font-caption-caps uppercase text-[#945806] font-bold tracking-wide">
+                Compliance Drift Status: REGRESSION DETECTED (PASS → FAIL)
+              </span>
+</div>
+<button class="px-2.5 py-1 text-label-code-sm font-label-code-sm text-on-surface bg-surface-container-lowest border border-[#D8CEB9] rounded hover:bg-[#F2EAD3] transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">history</span>
+              Revision Log
+            </button>
+</div>
+</div>
+<!-- Split Comparison Terminal Workspace -->
+<div class="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-[#D8CEB9] bg-[#1A2016] text-[#FAF7F2]">
+<!-- LEFT SIDE: Baseline Configuration (Compliant) -->
+<div class="flex flex-col">
+<!-- Sub-panel Header -->
+<div class="bg-[#242C1F] px-4 py-2.5 border-b border-[#344F1F] flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-[#b0d193]">check_circle</span>
+<span class="text-label-code-md font-label-code-md font-semibold text-white">Baseline Configuration v14.1</span>
+<span class="px-2 py-0.5 rounded text-[11px] font-caption-caps bg-[#344F1F] text-white font-bold tracking-wider">COMPLIANT - PASS</span>
+</div>
+<span class="text-label-code-sm font-label-code-sm text-secondary-fixed-dim/80">Golden Reference</span>
+</div>
+<!-- Code Body -->
+<div class="p-4 font-label-code-md text-label-code-md leading-relaxed overflow-x-auto space-y-1">
+<div class="text-[#867462] select-none text-caption-caps pb-1">! Section: Line Auxiliary &amp; Management Virtual Terminals</div>
+<!-- Line 140 -->
+<div class="flex items-center group py-0.5">
+<span class="w-12 text-right pr-4 text-[#635e4c] select-none group-hover:text-[#b0d193]">140</span>
+<span class="text-[#dee5d5]">line vty 0 4</span>
+</div>
+<!-- Line 141 -->
+<div class="flex items-center group py-0.5">
+<span class="w-12 text-right pr-4 text-[#635e4c] select-none group-hover:text-[#b0d193]">141</span>
+<span class="text-[#dee5d5]"> exec-timeout 15 0</span>
+</div>
+<!-- Line 142 (Validated State Highlight) -->
+<div class="flex items-center py-1 bg-[#344F1F]/40 border-l-2 border-[#b0d193] -mx-4 px-4">
+<span class="w-12 text-right pr-4 text-[#b0d193] font-bold select-none">142</span>
+<div class="flex-1 flex items-center justify-between">
+<span class="text-white font-semibold"> transport input ssh</span>
+<span class="text-label-code-sm font-label-code-sm text-[#b0d193] flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">shield</span> [VALIDATED: SECURE]
+                  </span>
+</div>
+</div>
+<!-- Line 143 -->
+<div class="flex items-center group py-0.5">
+<span class="w-12 text-right pr-4 text-[#635e4c] select-none group-hover:text-[#b0d193]">143</span>
+<span class="text-[#dee5d5]"> login local</span>
+</div>
+<!-- Line 144 -->
+<div class="flex items-center group py-0.5 text-[#635e4c]">
+<span class="w-12 text-right pr-4 text-[#464231] select-none">144</span>
+<span> logging synchronous</span>
+</div>
+</div>
+<!-- Normalized Fact & Compliance Status Drawer -->
+<div class="mt-auto bg-[#171d13] p-3 border-t border-[#2c3227] flex flex-wrap items-center justify-between text-label-code-sm font-label-code-sm gap-2">
+<div class="flex items-center gap-2">
+<span class="text-[#867462]">Normalized Fact:</span>
+<code class="text-[#b0d193] bg-[#242C1F] px-2 py-0.5 rounded border border-[#344F1F]">remote_management.telnet = false</code>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[#867462]">CIS Assessment:</span>
+<span class="px-2 py-0.5 rounded bg-[#344F1F] text-white font-bold text-caption-caps">CIS-NET-004: PASS</span>
+</div>
+</div>
+</div>
+<!-- RIGHT SIDE: Running Configuration (Drifted) -->
+<div class="flex flex-col">
+<!-- Sub-panel Header -->
+<div class="bg-[#322312] px-4 py-2.5 border-b border-[#603800] flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-[#F4991A]">warning</span>
+<span class="text-label-code-md font-label-code-md font-semibold text-white">Running Configuration v14.2</span>
+<span class="px-2 py-0.5 rounded text-[11px] font-caption-caps bg-[#A82218] text-white font-bold tracking-wider">DRIFTED - FAIL</span>
+</div>
+<span class="text-label-code-sm font-label-code-sm text-inverse-primary">Live Switch Image</span>
+</div>
+<!-- Code Body -->
+<div class="p-4 font-label-code-md text-label-code-md leading-relaxed overflow-x-auto space-y-1">
+<div class="text-[#867462] select-none text-caption-caps pb-1">! Active Memory Snapshot Captured via SNMP/SSH Agent</div>
+<!-- Line 140 -->
+<div class="flex items-center group py-0.5">
+<span class="w-12 text-right pr-4 text-[#635e4c] select-none group-hover:text-inverse-primary">140</span>
+<span class="text-[#dee5d5]">line vty 0 4</span>
+</div>
+<!-- Line 141 -->
+<div class="flex items-center group py-0.5">
+<span class="w-12 text-right pr-4 text-[#635e4c] select-none group-hover:text-inverse-primary">141</span>
+<span class="text-[#dee5d5]"> exec-timeout 15 0</span>
+</div>
+<!-- Line 142 (Amber Orange Drift Highlight with Red Strikethrough Marker) -->
+<div class="flex items-center py-1 bg-[#F4991A]/20 border-l-2 border-[#F4991A] -mx-4 px-4">
+<span class="w-12 text-right pr-4 text-[#F4991A] font-bold select-none">142</span>
+<div class="flex-1 flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="line-through text-error/80"> transport input ssh</span>
+<span class="text-white font-bold bg-[#603800] px-1.5 py-0.2 rounded border border-[#F4991A]">transport input telnet ssh</span>
+</div>
+<span class="text-label-code-sm font-label-code-sm text-primary-container font-bold flex items-center gap-1 bg-[#2c1700] px-1.5 py-0.5 rounded border border-[#DF860D]">
+<span class="material-symbols-outlined text-[14px]">crisis_alert</span> [DRIFT: MODIFIED]
+                  </span>
+</div>
+</div>
+<!-- Line 143 -->
+<div class="flex items-center group py-0.5">
+<span class="w-12 text-right pr-4 text-[#635e4c] select-none group-hover:text-inverse-primary">143</span>
+<span class="text-[#dee5d5]"> login local</span>
+</div>
+<!-- Line 144 -->
+<div class="flex items-center group py-0.5 text-[#635e4c]">
+<span class="w-12 text-right pr-4 text-[#464231] select-none">144</span>
+<span> logging synchronous</span>
+</div>
+</div>
+<!-- Normalized Fact & Compliance Status Drawer -->
+<div class="mt-auto bg-[#171d13] p-3 border-t border-[#2c3227] flex flex-wrap items-center justify-between text-label-code-sm font-label-code-sm gap-2">
+<div class="flex items-center gap-2">
+<span class="text-[#867462]">Normalized Fact:</span>
+<code class="text-inverse-primary bg-[#2c1700] px-2 py-0.5 rounded border border-[#F4991A]/50">remote_management.telnet = true (Changed)</code>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[#867462]">CIS Assessment:</span>
+<span class="px-2 py-0.5 rounded bg-[#A82218] text-white font-bold text-caption-caps">CIS-NET-004: FAIL</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ======================================================================= -->
+<!-- BOTTOM IMPACT & ROOT CAUSE ANALYSIS PANEL                              -->
+<!-- ======================================================================= -->
+<section class="bg-surface-container-lowest border border-[#E5DCC9] rounded-lg shadow-[0_1px_3px_rgba(26,32,22,0.04)] overflow-hidden">
+<!-- Header -->
+<div class="bg-[#F2EAD3] px-space-lg py-2.5 border-b border-[#D8CEB9] flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-[#344F1F]">troubleshoot</span>
+<span class="text-headline-md font-headline-md text-on-surface">Forensic Root Cause &amp; Operational Impact Assessment</span>
+</div>
+<span class="text-label-code-sm font-label-code-sm text-tertiary">Incident Ref: #IR-DRIFT-4091</span>
+</div>
+<div class="p-space-lg grid grid-cols-1 lg:grid-cols-12 gap-gutter-desktop">
+<!-- Column 1: Attribution & Change Governance Context (5 Cols) -->
+<div class="lg:col-span-5 space-y-space-md border-b lg:border-b-0 lg:border-r border-[#E5DCC9] pb-space-lg lg:pb-0 lg:pr-gutter-desktop">
+<!-- Operator attribution -->
+<div class="bg-[#FAF7F2] p-3 rounded border border-[#E5DCC9]">
+<span class="text-caption-caps font-caption-caps text-tertiary uppercase block mb-1">Who Changed It</span>
+<div class="flex items-start gap-3">
+<div class="w-8 h-8 rounded bg-[#344F1F]/10 text-[#344F1F] flex items-center justify-center font-bold">
+<span class="material-symbols-outlined text-[18px]">terminal</span>
+</div>
+<div>
+<div class="text-body-md font-headline-sm text-on-surface">Out-of-band CLI session via console port</div>
+<div class="text-label-code-sm font-label-code-sm text-tertiary mt-0.5">
+                    Operator: <span class="text-on-surface font-semibold bg-[#F2EAD3] px-1.5 py-0.5 rounded border border-[#D8CEB9]">admin_local_secops</span>
+</div>
+<div class="text-body-sm font-body-sm text-tertiary mt-1">Terminal TTY-0 directly connected in DataCenter-East Rack 04.</div>
+</div>
+</div>
+</div>
+<!-- Change Ticket Association -->
+<div class="bg-[#F9E6E4] p-3 rounded border border-[#A82218]/40">
+<span class="text-caption-caps font-caption-caps text-[#731811] uppercase block mb-1">Change Ticket Association</span>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-[#A82218]">cancel</span>
+<span class="text-headline-sm font-headline-sm text-[#731811]">NONE (Unapproved Emergency Change)</span>
+</div>
+<span class="text-caption-caps font-caption-caps bg-[#A82218] text-white px-2 py-0.5 rounded uppercase font-bold">Policy Bypass</span>
+</div>
+<p class="text-body-sm font-body-sm text-[#731811]/90 mt-1">
+                Zero matching change windows found in ServiceNow ITSM for device Cisco-Core-01 between 12:00 and 15:00 UTC.
+              </p>
+</div>
+</div>
+<!-- Column 2: Triggered Regulatory Violations (7 Cols) -->
+<div class="lg:col-span-7 flex flex-col justify-between space-y-space-md">
+<div>
+<span class="text-caption-caps font-caption-caps text-tertiary uppercase block mb-2">Triggered Compliance Violations</span>
+<div class="space-y-2">
+<!-- Violation 1 -->
+<div class="p-3 rounded border border-[#A82218] bg-[#FDF2CC] flex items-start justify-between gap-3">
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-[20px] text-[#ba1a1a] mt-0.5">error</span>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-label-code-sm font-label-code-sm font-bold text-on-surface">CIS-NET-004</span>
+<span class="px-1.5 py-0.2 rounded text-[10px] font-caption-caps bg-[#A82218] text-white font-bold uppercase">High Severity</span>
+<span class="text-body-sm font-body-sm font-semibold text-on-surface">Disable cleartext Telnet on all VTY lines</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1">
+                        Cleartext Telnet protocol transmits administrative credentials unencrypted over ingress network interfaces, violating NIST SP 800-53 SC-8.
+                      </p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-[18px]">chevron_right</span>
+</div>
+<!-- Violation 2 -->
+<div class="p-3 rounded border border-[#DF860D] bg-[#FAF7F2] flex items-start justify-between gap-3">
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-[20px] text-[#F4991A] mt-0.5">warning</span>
+<div>
+<div class="flex items-center gap-2">
+<span class="text-label-code-sm font-label-code-sm font-bold text-on-surface">NIST-AU-8</span>
+<span class="px-1.5 py-0.2 rounded text-[10px] font-caption-caps bg-[#F4991A] text-on-secondary-fixed font-bold uppercase">Medium Severity</span>
+<span class="text-body-sm font-body-sm font-semibold text-on-surface">NTP time drift detected</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1">
+                        Console configuration change disrupted peer NTP synchronization clock source; timestamp delta exceeded 120ms tolerance.
+                      </p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-[18px]">chevron_right</span>
+</div>
+</div>
+</div>
+<!-- Quick Action Buttons -->
+<div class="pt-3 border-t border-[#E5DCC9] flex flex-wrap items-center justify-end gap-2.5">
+<!-- Action 1: Create Incident -->
+<button class="flex items-center gap-1.5 px-3 py-2 rounded bg-surface-container-lowest hover:bg-[#F2EAD3] text-on-surface border border-[#D8CEB9] font-headline-sm text-body-sm transition duration-150 shadow-sm">
+<span class="material-symbols-outlined text-[17px] text-[#A82218]">report_problem</span>
+<span>Create ServiceNow Security Incident</span>
+</button>
+<!-- Action 2: Risk Waiver -->
+<button class="flex items-center gap-1.5 px-3 py-2 rounded bg-surface-container-lowest hover:bg-[#F2EAD3] text-on-surface border border-[#D8CEB9] font-headline-sm text-body-sm transition duration-150 shadow-sm">
+<span class="material-symbols-outlined text-[17px] text-[#DF860D]">rule_settings</span>
+<span>Acknowledge &amp; Accept Risk (Waiver)</span>
+</button>
+<!-- Action 3: Primary Reversion CLI Patch -->
+<button class="flex items-center gap-1.5 px-4 py-2 rounded bg-[#344F1F] hover:bg-[#283D18] text-white font-headline-sm text-body-sm transition duration-150 shadow border border-[#283D18]">
+<span class="material-symbols-outlined text-[18px] text-secondary-fixed-dim">undo</span>
+<span>Generate Reversion Script (CLI Patch)</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Secondary Devices in Drift Table (Contextual Navigation) -->
+<section class="bg-surface-container-lowest border border-[#E5DCC9] rounded-lg shadow-[0_1px_3px_rgba(26,32,22,0.04)] overflow-hidden">
+<div class="bg-[#F2EAD3] px-space-lg py-2.5 border-b border-[#D8CEB9] flex items-center justify-between">
+<span class="text-caption-caps font-caption-caps uppercase text-on-surface font-bold tracking-wider">Remaining Drifted Devices In Queue (2)</span>
+<span class="text-label-code-sm font-label-code-sm text-tertiary">Fleet Segment: US-East-Tier1</span>
+</div>
+<div class="divide-y divide-[#EFE8D8] text-body-sm">
+<!-- Device Row 1 -->
+<div class="p-space-md flex flex-wrap items-center justify-between hover:bg-[#F4EEDF] transition-colors gap-2">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[18px] text-tertiary">router</span>
+<div>
+<span class="font-bold text-on-surface">Aruba-Access-12</span>
+<span class="text-tertiary font-label-code-sm text-[11px] ml-2">10.240.12.8 • Building B Floor 2</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-label-code-sm font-label-code-sm text-[#DF860D] bg-[#FEF4E6] px-2 py-0.5 rounded border border-[#F4991A]/30">SNMP v1/v2c Read-Write String Added</span>
+<span class="text-body-sm font-body-sm text-tertiary">4 hours ago</span>
+<button class="px-2 py-1 bg-surface-container-lowest border border-[#D8CEB9] rounded text-body-sm hover:bg-surface-container">Inspect Diff</button>
+</div>
+</div>
+<!-- Device Row 2 -->
+<div class="p-space-md flex flex-wrap items-center justify-between hover:bg-[#F4EEDF] transition-colors gap-2">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[18px] text-tertiary">security</span>
+<div>
+<span class="font-bold text-on-surface">FortiGate-DC-01</span>
+<span class="text-tertiary font-label-code-sm text-[11px] ml-2">10.240.1.254 • Perimeter FW Cluster A</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-label-code-sm font-label-code-sm text-[#ba1a1a] bg-[#F9E6E4] px-2 py-0.5 rounded border border-[#ba1a1a]/30">DISA-NET-021: HTTP Web GUI Enabled</span>
+<span class="text-body-sm font-body-sm text-tertiary">1 hour ago</span>
+<button class="px-2 py-1 bg-surface-container-lowest border border-[#D8CEB9] rounded text-body-sm hover:bg-surface-container">Inspect Diff</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Archival Footer Stamp -->
+<footer class="px-margin-desktop py-space-sm border-t border-[#E5DCC9] bg-[#FAF7F2] text-label-code-sm font-label-code-sm text-tertiary flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-[#344F1F]"></span>
+<span>CIPHER-X AI AUDIT ENGINE v4.8.2-PROD</span>
+<span class="text-outline-variant">•</span>
+<span>Cryptographic State Proof: 0x9e88...ec12</span>
+</div>
+<div>
+<span>Institutional Security Baseline: NIST 800-53 Rev 5 &amp; CIS Benchmark Level 2</span>
+</div>
+</footer>
+</div>
+</body></html>

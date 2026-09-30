@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cipher-X - Security Knowledge Graph</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Hanken Grotesk & JetBrains Mono -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300..900;1,300..900&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with Forms and Container Queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-secondary-fixed": "#0b2000",
+            "on-primary-fixed-variant": "#683d00",
+            "on-tertiary-fixed": "#1f1c0e",
+            "secondary-fixed": "#cbedad",
+            "secondary": "#4a6633",
+            "on-secondary-fixed-variant": "#334e1e",
+            "surface-container-highest": "#dee5d5",
+            "secondary-fixed-dim": "#b0d193",
+            "surface-container": "#eaf0e0",
+            "primary-container": "#f4991a",
+            "outline": "#867462",
+            "on-primary-fixed": "#2c1700",
+            "on-error-container": "#93000a",
+            "inverse-primary": "#ffb869",
+            "surface-container-high": "#e4eada",
+            "on-error": "#ffffff",
+            "on-background": "#171d13",
+            "tertiary-fixed-dim": "#cdc6b0",
+            "surface-container-low": "#f0f6e5",
+            "surface": "#f5fceb",
+            "surface-bright": "#f5fceb",
+            "error": "#ba1a1a",
+            "on-tertiary-fixed-variant": "#4b4736",
+            "on-tertiary": "#ffffff",
+            "surface-variant": "#dee5d5",
+            "on-secondary": "#ffffff",
+            "background": "#f5fceb",
+            "primary-fixed-dim": "#ffb869",
+            "on-surface": "#171d13",
+            "primary-fixed": "#ffdcbb",
+            "secondary-container": "#c8eaaa",
+            "surface-tint": "#885200",
+            "inverse-on-surface": "#edf3e3",
+            "outline-variant": "#d9c3ae",
+            "on-primary-container": "#603800",
+            "on-tertiary-container": "#464231",
+            "tertiary-container": "#b4ae99",
+            "on-surface-variant": "#544434",
+            "tertiary-fixed": "#eae2cb",
+            "primary": "#885200",
+            "surface-container-lowest": "#ffffff",
+            "surface-dim": "#d6dccc",
+            "inverse-surface": "#2c3227",
+            "on-primary": "#ffffff",
+            "error-container": "#ffdad6",
+            "tertiary": "#635e4c",
+            "on-secondary-container": "#4e6b37"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-xs": "0.25rem",
+            "margin-tablet": "1.5rem",
+            "space-md": "0.75rem",
+            "space-lg": "1rem",
+            "space-sm": "0.5rem",
+            "gutter-desktop": "1.5rem",
+            "margin": "1rem",
+            "space-3xl": "3rem",
+            "gutter": "1rem",
+            "space-2xl": "2rem",
+            "margin-desktop": "2rem",
+            "space-xl": "1.5rem",
+            "space-2xs": "0.125rem"
+          },
+          "fontFamily": {
+            "headline-md": ["Hanken Grotesk"],
+            "body-lg": ["Hanken Grotesk"],
+            "headline-lg-mobile": ["Hanken Grotesk"],
+            "label-code-md": ["JetBrains Mono"],
+            "headline-sm": ["Hanken Grotesk"],
+            "headline-xl": ["Hanken Grotesk"],
+            "label-code-sm": ["JetBrains Mono"],
+            "caption-caps": ["Hanken Grotesk"],
+            "body-sm": ["Hanken Grotesk"],
+            "body-md": ["Hanken Grotesk"],
+            "headline-lg": ["Hanken Grotesk"],
+            "headline-xl-mobile": ["Hanken Grotesk"]
+          },
+          "fontSize": {
+            "headline-md": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+            "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+            "headline-lg-mobile": ["20px", {"lineHeight": "26px", "fontWeight": "600"}],
+            "label-code-md": ["13px", {"lineHeight": "18px", "fontWeight": "500"}],
+            "headline-sm": ["15px", {"lineHeight": "20px", "fontWeight": "600"}],
+            "headline-xl": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+            "label-code-sm": ["11px", {"lineHeight": "14px", "fontWeight": "500"}],
+            "caption-caps": ["10px", {"lineHeight": "12px", "fontWeight": "700"}],
+            "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+            "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+            "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+            "headline-xl-mobile": ["26px", {"lineHeight": "32px", "fontWeight": "700"}]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .dot-grid {
+      background-image: radial-gradient(rgba(134, 116, 98, 0.22) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #d9c3ae;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body class="bg-[#F9F5F0] text-on-surface antialiased overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
+<!-- ========================================================================= -->
+<!-- SHARED COMPONENT: SideNavBar (Persistent Desktop Rail)                    -->
+<!-- ========================================================================= -->
+<aside class="fixed top-0 left-0 h-screen w-64 flex flex-col justify-between bg-secondary dark:bg-surface-container-highest border-r border-outline-variant dark:border-outline shadow-sm dark:shadow-none z-40 py-space-lg px-space-md">
+<!-- Header / Brand identity -->
+<div>
+<div class="flex items-center gap-3 px-2 pb-space-lg border-b border-secondary-fixed-dim/20 mb-space-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container-lowest/15 flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined text-headline-lg" data-icon="shield">verified_user</span>
+</div>
+<div>
+<div class="text-headline-md font-headline-md font-bold text-on-secondary dark:text-on-surface tracking-wider">Cipher-X</div>
+<div class="text-label-code-sm font-label-code-sm text-secondary-fixed-dim">AI Compliance Auditor</div>
+</div>
+</div>
+<!-- Quick Action Trigger Audit -->
+<div class="px-2 mb-space-md">
+<button class="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-primary-container text-on-primary-container font-headline-sm text-headline-sm hover:brightness-95 transition duration-150 ease-in-out shadow-sm">
+<span class="material-symbols-outlined text-headline-sm" data-icon="bolt">bolt</span>
+<span>Trigger Audit</span>
+</button>
+</div>
+<!-- Navigation Tabs (16 items, 'Security Graph' strictly ACTIVE) -->
+<div class="space-y-1 overflow-y-auto max-h-[calc(100vh-270px)] pr-1 custom-scroll">
+<!-- 1. Overview -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-label-code-md font-label-code-md">Overview</span>
+</a>
+<!-- 2. Devices -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="router">router</span>
+<span class="text-label-code-md font-label-code-md">Devices</span>
+</a>
+<!-- 3. Configurations -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="terminal">terminal</span>
+<span class="text-label-code-md font-label-code-md">Configurations</span>
+</a>
+<!-- 4. Compliance -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="verified_user">verified_user</span>
+<span class="text-label-code-md font-label-code-md">Compliance</span>
+</a>
+<!-- 5. Findings -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="rule">rule</span>
+<span class="text-label-code-md font-label-code-md">Findings</span>
+</a>
+<!-- 6. Training Studio -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="model_training">model_training</span>
+<span class="text-label-code-md font-label-code-md">Training Studio</span>
+</a>
+<!-- 7. Drift -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="compare_arrows">compare_arrows</span>
+<span class="text-label-code-md font-label-code-md">Drift</span>
+</a>
+<!-- 8. Reports -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="assessment">assessment</span>
+<span class="text-label-code-md font-label-code-md">Reports</span>
+</a>
+<!-- 9. Security Graph (ACTIVE TAB) -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-surface-container-lowest/10 text-on-secondary font-headline-sm border-l-2 border-primary-container" href="#">
+<span class="material-symbols-outlined text-primary-container" data-icon="hub">hub</span>
+<span class="text-label-code-md font-label-code-md">Security Graph</span>
+</a>
+<!-- 10. Query -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="manage_search">manage_search</span>
+<span class="text-label-code-md font-label-code-md">Query</span>
+</a>
+<!-- 11. Frameworks & Rules -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="policy">policy</span>
+<span class="text-label-code-md font-label-code-md">Frameworks &amp; Rules</span>
+</a>
+<!-- 12. Mappings -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="alt_route">alt_route</span>
+<span class="text-label-code-md font-label-code-md">Mappings</span>
+</a>
+<!-- 13. Audit Trail -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="history_toggle_subpath">image_search</span>
+<span class="text-label-code-md font-label-code-md">Audit Trail</span>
+</a>
+<!-- 14. System Status -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="check_circle">check_circle</span>
+<span class="text-label-code-md font-label-code-md">System Status</span>
+</a>
+<!-- 15. Help -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="text-label-code-md font-label-code-md">Help</span>
+</a>
+<!-- 16. Settings -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-secondary-fixed-dim hover:text-on-secondary hover:bg-surface-container-lowest/5 font-body-md transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-label-code-md font-label-code-md">Settings</span>
+</a>
+</div>
+</div>
+<!-- Footer Profile & Sign out -->
+<div class="pt-space-sm border-t border-secondary-fixed-dim/20 space-y-1">
+<div class="flex items-center justify-between px-2 py-1.5 rounded-lg bg-surface-container-lowest/5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary-fixed-dim" data-icon="account_circle">account_circle</span>
+<span class="text-label-code-sm font-label-code-sm text-on-secondary">Security Analyst</span>
+</div>
+<button class="text-secondary-fixed-dim hover:text-on-secondary transition-colors" title="Sign Out">
+<span class="material-symbols-outlined text-headline-sm" data-icon="logout">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- ========================================================================= -->
+<!-- MAIN APP CONTAINER (Offset for Desktop Nav)                               -->
+<!-- ========================================================================= -->
+<div class="pl-64 flex flex-col min-h-screen">
+<!-- SHARED COMPONENT: TopNavBar -->
+<header class="docked full-width top sticky top-0 z-30 flex justify-between items-center w-full px-margin-desktop py-space-sm bg-surface-container-lowest dark:bg-surface-container border-b border-outline-variant dark:border-outline shadow-sm">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="text-headline-sm font-headline-sm font-bold text-on-surface">Cipher-X</span>
+<span class="text-outline">/</span>
+<span class="text-secondary dark:text-secondary-fixed font-headline-sm text-headline-sm">Security Graph</span>
+</div>
+<!-- Scope / Environment Badge -->
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-secondary/10 border border-secondary/20 text-secondary">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+<span class="text-label-code-sm font-label-code-sm font-bold">Production-US-East</span>
+</div>
+</div>
+<!-- Center Graph Controls -->
+<div class="flex items-center bg-[#F2EAD3] border border-[#D8CEB9] rounded p-0.5 space-x-0.5 shadow-sm">
+<button class="p-1.5 hover:bg-surface-container-lowest rounded text-on-surface transition-colors" title="Zoom In">
+<span class="material-symbols-outlined text-headline-sm" data-icon="zoom_in">zoom_in</span>
+</button>
+<button class="p-1.5 hover:bg-surface-container-lowest rounded text-on-surface transition-colors" title="Zoom Out">
+<span class="material-symbols-outlined text-headline-sm" data-icon="zoom_out">zoom_out</span>
+</button>
+<div class="w-px h-4 bg-[#D8CEB9] my-auto"></div>
+<button class="p-1.5 hover:bg-surface-container-lowest rounded text-on-surface transition-colors flex items-center gap-1 px-2" title="Center Graph">
+<span class="material-symbols-outlined text-headline-sm" data-icon="center_focus_strong">center_focus_strong</span>
+<span class="text-caption-caps font-caption-caps">Center</span>
+</button>
+<button class="p-1.5 hover:bg-surface-container-lowest rounded text-on-surface transition-colors flex items-center gap-1 px-2" title="Reset Layout">
+<span class="material-symbols-outlined text-headline-sm" data-icon="restart_alt">restart_alt</span>
+<span class="text-caption-caps font-caption-caps">Reset</span>
+</button>
+<button class="p-1.5 hover:bg-surface-container-lowest rounded text-on-surface transition-colors" title="Fullscreen">
+<span class="material-symbols-outlined text-headline-sm" data-icon="fullscreen">fullscreen</span>
+</button>
+</div>
+<!-- Trailing Action Cluster -->
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1 text-on-surface-variant">
+<button class="p-2 hover:bg-surface-container-low rounded-lg transition-colors" title="Notifications">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 hover:bg-surface-container-low rounded-lg transition-colors" title="Help">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<button class="p-2 hover:bg-surface-container-low rounded-lg transition-colors" title="Tune Settings">
+<span class="material-symbols-outlined" data-icon="tune">tune</span>
+</button>
+</div>
+<!-- Export CTA -->
+<button class="flex items-center gap-2 px-3 py-1.5 rounded bg-primary-container text-on-primary-container font-headline-sm text-label-code-md border border-[#DF860D] shadow-sm hover:brightness-95 transition-all">
+<span class="material-symbols-outlined text-headline-sm" data-icon="account_tree">account_tree</span>
+<span>Export Graph Topology</span>
+</button>
+</div>
+</header>
+<!-- Header Section -->
+<section class="bg-surface-container-lowest px-margin-desktop py-space-md border-b border-outline-variant">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
+<div>
+<h1 class="text-headline-lg font-headline-lg text-on-surface flex items-center gap-2">
+<span>Security Knowledge Graph</span>
+<span class="text-label-code-sm font-label-code-sm px-2 py-0.5 rounded bg-[#E7EFE0] text-[#344F1F] border border-[#344F1F]/30">LIVE CAUSAL MAP</span>
+</h1>
+<p class="text-body-md font-body-md text-on-surface-variant mt-0.5 max-w-4xl">
+            Interactive relational topology visualizing the causal compliance chain: <span class="font-semibold text-secondary">Device</span> → <span class="font-semibold text-[#885200]">Configuration Snapshot</span> → <span class="font-semibold text-primary-container">Normalized Fact</span> → <span class="font-semibold text-tertiary">Compliance Control</span> → <span class="font-semibold text-error">Security Finding</span> → <span class="font-semibold text-secondary">Remediation Action</span>.
+          </p>
+</div>
+<div class="flex items-center gap-2 text-label-code-sm font-label-code-sm text-tertiary">
+<span class="material-symbols-outlined text-sm" data-icon="sync">sync</span>
+<span>Graph updated 4m ago</span>
+</div>
+</div>
+</section>
+<!-- Graph Controls & Filter Ribbon -->
+<section class="bg-[#F2EAD3] border-b border-[#D8CEB9] px-margin-desktop py-space-sm flex flex-wrap items-center justify-between gap-3 shadow-xs">
+<!-- Node Type Legend & Toggles -->
+<div class="flex items-center gap-2 flex-wrap">
+<span class="text-caption-caps font-caption-caps text-on-surface/70 uppercase tracking-wider mr-1">Active Layers:</span>
+<button class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#344F1F] text-white text-label-code-sm font-label-code-sm border border-[#283D18] shadow-xs">
+<span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+<span>Device</span>
+</button>
+<button class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#FAF7F2] text-on-surface text-label-code-sm font-label-code-sm border border-[#D8CEB9]">
+<span class="w-2 h-2 rounded-full bg-[#B8AC94]"></span>
+<span>Config</span>
+</button>
+<button class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#FEF4E6] text-[#945806] text-label-code-sm font-label-code-sm border border-[#F4991A]">
+<span class="w-2 h-2 rounded-full bg-[#F4991A]"></span>
+<span>Security Fact</span>
+</button>
+<button class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-white text-tertiary text-label-code-sm font-label-code-sm border border-[#D8CEB9]">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span>Control Policy</span>
+</button>
+<button class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#F9E6E4] text-[#731811] text-label-code-sm font-label-code-sm border border-[#A82218]">
+<span class="w-2 h-2 rounded-full bg-error"></span>
+<span>Finding</span>
+</button>
+<button class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#E7EFE0] text-[#344F1F] text-label-code-sm font-label-code-sm border border-[#344F1F]">
+<span class="w-2 h-2 rounded-full bg-[#344F1F]"></span>
+<span>Remediation</span>
+</button>
+</div>
+<!-- Filters & Search -->
+<div class="flex items-center gap-3 flex-wrap">
+<!-- Vendor Filter -->
+<div class="flex items-center gap-1">
+<label class="text-caption-caps font-caption-caps text-on-surface/70 uppercase">Vendor:</label>
+<select class="bg-surface-container-lowest border border-[#D8CEB9] rounded text-label-code-sm font-label-code-sm py-1 px-2 focus:ring-1 focus:ring-secondary focus:border-secondary">
+<option>All Vendors</option>
+<option selected="">Cisco</option>
+<option>Fortinet</option>
+<option>Palo Alto</option>
+<option>Juniper</option>
+</select>
+</div>
+<!-- Severity Filter -->
+<div class="flex items-center gap-1">
+<label class="text-caption-caps font-caption-caps text-on-surface/70 uppercase">Severity:</label>
+<select class="bg-surface-container-lowest border border-[#D8CEB9] rounded text-label-code-sm font-label-code-sm py-1 px-2 focus:ring-1 focus:ring-secondary focus:border-secondary">
+<option>All Severities</option>
+<option selected="">High</option>
+<option>Medium</option>
+<option>Low</option>
+</select>
+</div>
+<!-- Search Node Input -->
+<div class="relative">
+<span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-tertiary text-sm" data-icon="search">search</span>
+<input class="pl-8 pr-3 py-1 bg-surface-container-lowest border border-[#D8CEB9] rounded text-label-code-sm font-label-code-sm focus:ring-2 focus:ring-secondary/20 focus:border-secondary w-52" placeholder="Find node or CIDR..." type="text" value="Cisco-Core-01"/>
+</div>
+</div>
+</section>
+<!-- ========================================================================= -->
+<!-- WORKSPACE CANVAS + DOCKED INSPECTOR SIDEBAR                                -->
+<!-- ========================================================================= -->
+<div class="flex-1 flex relative overflow-hidden bg-[#F9F5F0]">
+<!-- Graph Canvas (Dot Grid Canvas with Multi-Tier Nodes) -->
+<main class="flex-1 relative dot-grid overflow-auto custom-scroll p-6 min-h-[720px] select-none">
+<!-- SVG Connections Layer behind nodes -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none" style="min-width: 1400px; min-height: 720px;">
+<defs>
+<marker id="arrow-green" markerheight="6" markerwidth="6" orient="auto-start-reverse" refx="6" refy="5" viewbox="0 0 10 10">
+<path d="M 0 1 L 10 5 L 0 9 z" fill="#344F1F"></path>
+</marker>
+<marker id="arrow-amber" markerheight="6" markerwidth="6" orient="auto-start-reverse" refx="6" refy="5" viewbox="0 0 10 10">
+<path d="M 0 1 L 10 5 L 0 9 z" fill="#F4991A"></path>
+</marker>
+<marker id="arrow-red" markerheight="6" markerwidth="6" orient="auto-start-reverse" refx="6" refy="5" viewbox="0 0 10 10">
+<path d="M 0 1 L 10 5 L 0 9 z" fill="#BA1A1A"></path>
+</marker>
+<marker id="arrow-slate" markerheight="6" markerwidth="6" orient="auto-start-reverse" refx="6" refy="5" viewbox="0 0 10 10">
+<path d="M 0 1 L 10 5 L 0 9 z" fill="#635E4C"></path>
+</marker>
+</defs>
+<!-- TIER 1 -> TIER 2 -->
+<path d="M 230 290 C 260 290, 260 290, 290 290" fill="none" marker-end="url(#arrow-green)" stroke="#344F1F" stroke-dasharray="4 2" stroke-width="2.5"></path>
+<!-- TIER 2 -> TIER 3 (Split to 2 Facts) -->
+<path d="M 520 270 C 550 270, 560 200, 580 200" fill="none" marker-end="url(#arrow-amber)" stroke="#F4991A" stroke-width="2"></path>
+<path d="M 520 310 C 550 310, 560 380, 580 380" fill="none" marker-end="url(#arrow-amber)" stroke="#F4991A" stroke-width="2"></path>
+<!-- TIER 3 -> TIER 4 -->
+<!-- Fact 1 -> Control 1 -->
+<path d="M 810 200 C 840 200, 840 200, 870 200" fill="none" marker-end="url(#arrow-slate)" stroke="#635E4C" stroke-width="2"></path>
+<!-- Fact 2 -> Control 2 -->
+<path d="M 810 380 C 840 380, 840 380, 870 380" fill="none" marker-end="url(#arrow-slate)" stroke="#635E4C" stroke-width="2"></path>
+<!-- TIER 4 -> TIER 5 (FAIL Findings) -->
+<!-- Control 1 -> Finding 1 (Selected Highlight Path) -->
+<path d="M 1090 200 C 1120 200, 1120 200, 1150 200" fill="none" marker-end="url(#arrow-red)" stroke="#BA1A1A" stroke-width="3"></path>
+<!-- Control 2 -> Finding 2 -->
+<path d="M 1090 380 C 1120 380, 1120 380, 1150 380" fill="none" marker-end="url(#arrow-red)" stroke="#BA1A1A" stroke-width="2"></path>
+<!-- TIER 5 -> TIER 6 (Remediations) -->
+<!-- Finding 1 -> Remediation 1 -->
+<path d="M 1370 200 C 1400 200, 1400 200, 1430 200" fill="none" marker-end="url(#arrow-green)" stroke="#344F1F" stroke-width="2.5"></path>
+<!-- Finding 2 -> Remediation 2 -->
+<path d="M 1370 380 C 1400 380, 1400 380, 1430 380" fill="none" marker-end="url(#arrow-green)" stroke="#344F1F" stroke-width="2"></path>
+</svg>
+<!-- Dynamic Tier Column Headers -->
+<div class="grid grid-cols-6 gap-6 min-w-[1720px] mb-8 relative z-10">
+<div class="text-caption-caps font-caption-caps text-on-surface/70 uppercase tracking-widest border-b border-[#D8CEB9] pb-1 flex items-center justify-between">
+<span>Tier 1: Device Node</span>
+<span class="text-label-code-sm text-secondary font-bold">N=1</span>
+</div>
+<div class="text-caption-caps font-caption-caps text-on-surface/70 uppercase tracking-widest border-b border-[#D8CEB9] pb-1 flex items-center justify-between">
+<span>Tier 2: Config Snapshot</span>
+<span class="text-label-code-sm text-primary font-bold">N=1</span>
+</div>
+<div class="text-caption-caps font-caption-caps text-on-surface/70 uppercase tracking-widest border-b border-[#D8CEB9] pb-1 flex items-center justify-between">
+<span>Tier 3: Normalized Facts</span>
+<span class="text-label-code-sm text-primary-container font-bold">N=2</span>
+</div>
+<div class="text-caption-caps font-caption-caps text-on-surface/70 uppercase tracking-widest border-b border-[#D8CEB9] pb-1 flex items-center justify-between">
+<span>Tier 4: Controls</span>
+<span class="text-label-code-sm text-tertiary font-bold">N=2</span>
+</div>
+<div class="text-caption-caps font-caption-caps text-on-surface/70 uppercase tracking-widest border-b border-[#D8CEB9] pb-1 flex items-center justify-between">
+<span>Tier 5: Active Findings</span>
+<span class="text-label-code-sm text-error font-bold">N=2 FAIL</span>
+</div>
+<div class="text-caption-caps font-caption-caps text-on-surface/70 uppercase tracking-widest border-b border-[#D8CEB9] pb-1 flex items-center justify-between">
+<span>Tier 6: Playbooks</span>
+<span class="text-label-code-sm text-secondary font-bold">N=2</span>
+</div>
+</div>
+<!-- TIERED DIRECTED GRAPH NODES GRID -->
+<div class="grid grid-cols-6 gap-6 min-w-[1720px] relative z-10 pt-4">
+<!-- ---------------- TIER 1: DEVICE NODE ---------------- -->
+<div class="flex flex-col justify-center h-[520px]">
+<div class="w-[210px] bg-[#344F1F] text-white rounded-lg p-3 border-2 border-[#283D18] shadow-md hover:scale-[1.02] transition-transform cursor-pointer relative group">
+<div class="flex items-center justify-between mb-2">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-white/10 text-label-code-sm font-label-code-sm text-secondary-fixed">
+<span class="material-symbols-outlined text-sm" data-icon="router">router</span>
+                  CORE SWITCH
+                </span>
+<span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+</div>
+<div class="font-headline-sm text-headline-sm font-bold text-white tracking-wide">Cisco-Core-01</div>
+<div class="text-label-code-sm font-label-code-sm text-secondary-fixed-dim mt-1">IP: 10.240.0.1</div>
+<div class="text-label-code-sm font-label-code-sm text-secondary-fixed-dim/80">Catalyst 9600 Series</div>
+<div class="mt-3 pt-2 border-t border-white/20 flex items-center justify-between text-caption-caps font-caption-caps text-white/70">
+<span>VLAN 10,20,50</span>
+<span>UPTIME: 142d</span>
+</div>
+<!-- Connector Anchor -->
+<div class="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#344F1F] border-2 border-white"></div>
+</div>
+</div>
+<!-- ---------------- TIER 2: CONFIG SNAPSHOT ---------------- -->
+<div class="flex flex-col justify-center h-[520px]">
+<div class="w-[230px] bg-[#F2EAD3] text-on-surface rounded-lg p-3 border border-[#D8CEB9] shadow-sm hover:scale-[1.02] transition-transform cursor-pointer relative group">
+<!-- Left Anchor -->
+<div class="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#FAF7F2] border-2 border-[#344F1F]"></div>
+<div class="flex items-center justify-between mb-2">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white text-label-code-sm font-label-code-sm text-tertiary border border-[#D8CEB9]">
+<span class="material-symbols-outlined text-sm" data-icon="terminal">terminal</span>
+                  CFG SNAPSHOT
+                </span>
+<span class="text-caption-caps font-caption-caps text-tertiary">v14.2</span>
+</div>
+<div class="font-headline-sm text-headline-sm font-semibold text-on-surface">cisco-core-01-running.cfg</div>
+<div class="mt-2 p-1.5 rounded bg-white/80 border border-[#D8CEB9] text-label-code-sm font-label-code-sm text-tertiary flex items-center justify-between">
+<span>SHA256: 8f91...c7d2</span>
+<span class="material-symbols-outlined text-sm" data-icon="content_copy">content_copy</span>
+</div>
+<div class="mt-2 text-caption-caps font-caption-caps text-on-surface/60">Parsed 2,410 AST tokens</div>
+<!-- Right Anchor -->
+<div class="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#FAF7F2] border-2 border-[#F4991A]"></div>
+</div>
+</div>
+<!-- ---------------- TIER 3: NORMALIZED FACTS ---------------- -->
+<div class="flex flex-col justify-between h-[520px] py-12">
+<!-- Fact 1 (Telnet) -->
+<div class="w-[230px] bg-[#FEF4E6] text-[#945806] rounded-lg p-3 border-2 border-[#F4991A] shadow-md hover:scale-[1.02] transition-transform cursor-pointer relative group ring-2 ring-[#F4991A]/30">
+<!-- Left Anchor -->
+<div class="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#FEF4E6] border-2 border-[#F4991A]"></div>
+<div class="flex items-center justify-between mb-1.5">
+<span class="text-caption-caps font-caption-caps font-bold px-1.5 py-0.5 rounded bg-[#F4991A] text-white">AST FACT</span>
+<span class="text-label-code-sm font-label-code-sm font-bold text-[#945806]">Conf: 98%</span>
+</div>
+<div class="text-label-code-sm font-label-code-sm font-semibold text-on-surface break-words">
+                remote_management.telnet = <span class="text-error font-bold">true</span>
+</div>
+<div class="mt-2 text-caption-caps font-caption-caps text-[#945806]/80 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs" data-icon="data_object">data_object</span>
+                Line 142: transport input telnet
+              </div>
+<!-- Right Anchor -->
+<div class="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#FEF4E6] border-2 border-[#635E4C]"></div>
+</div>
+<!-- Fact 2 (Enable Secret Type 5) -->
+<div class="w-[230px] bg-[#FEF4E6] text-[#945806] rounded-lg p-3 border border-[#F4991A] shadow-sm hover:scale-[1.02] transition-transform cursor-pointer relative group">
+<!-- Left Anchor -->
+<div class="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#FEF4E6] border-2 border-[#F4991A]"></div>
+<div class="flex items-center justify-between mb-1.5">
+<span class="text-caption-caps font-caption-caps font-bold px-1.5 py-0.5 rounded bg-[#F4991A] text-white">AST FACT</span>
+<span class="text-label-code-sm font-label-code-sm font-bold text-[#945806]">Conf: 100%</span>
+</div>
+<div class="text-label-code-sm font-label-code-sm font-semibold text-on-surface break-words">
+                auth.enable_secret_type = <span class="text-error font-bold">5</span>
+</div>
+<div class="mt-2 text-caption-caps font-caption-caps text-[#945806]/80 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs" data-icon="warning">warning</span>
+                Obsolete MD5 Hash Detected
+              </div>
+<!-- Right Anchor -->
+<div class="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#FEF4E6] border-2 border-[#635E4C]"></div>
+</div>
+</div>
+<!-- ---------------- TIER 4: COMPLIANCE CONTROLS ---------------- -->
+<div class="flex flex-col justify-between h-[520px] py-12">
+<!-- Control 1 (CIS) -->
+<div class="w-[220px] bg-white text-on-surface rounded-lg p-3 border border-[#D8CEB9] shadow-sm hover:scale-[1.02] transition-transform cursor-pointer relative group">
+<!-- Left Anchor -->
+<div class="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white border-2 border-[#635E4C]"></div>
+<div class="flex items-center justify-between mb-1">
+<span class="px-2 py-0.5 rounded bg-tertiary-fixed text-on-tertiary-fixed text-label-code-sm font-label-code-sm font-bold">CIS Cisco 4.1</span>
+<span class="text-caption-caps font-caption-caps text-tertiary">POLICY</span>
+</div>
+<div class="font-headline-sm text-headline-sm font-bold mt-1 text-on-surface">CIS-NET-004</div>
+<div class="text-body-sm font-body-sm text-on-surface-variant mt-1">Disable Cleartext Telnet Access for VTY Lines</div>
+<!-- Right Anchor -->
+<div class="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white border-2 border-[#BA1A1A]"></div>
+</div>
+<!-- Control 2 (DISA) -->
+<div class="w-[220px] bg-white text-on-surface rounded-lg p-3 border border-[#D8CEB9] shadow-sm hover:scale-[1.02] transition-transform cursor-pointer relative group">
+<!-- Left Anchor -->
+<div class="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white border-2 border-[#635E4C]"></div>
+<div class="flex items-center justify-between mb-1">
+<span class="px-2 py-0.5 rounded bg-tertiary-fixed text-on-tertiary-fixed text-label-code-sm font-label-code-sm font-bold">DISA STIG</span>
+<span class="text-caption-caps font-caption-caps text-tertiary">POLICY</span>
+</div>
+<div class="font-headline-sm text-headline-sm font-bold mt-1 text-on-surface">DISA-NET-041</div>
+<div class="text-body-sm font-body-sm text-on-surface-variant mt-1">Prohibit Insecure Type 5 Cryptographic Passwords</div>
+<!-- Right Anchor -->
+<div class="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white border-2 border-[#BA1A1A]"></div>
+</div>
+</div>
+<!-- ---------------- TIER 5: ACTIVE FINDINGS ---------------- -->
+<div class="flex flex-col justify-between h-[520px] py-12">
+<!-- Finding 1 (SELECTED INSPECTION TARGET) -->
+<div class="w-[220px] bg-[#F9E6E4] text-[#731811] rounded-lg p-3 border-2 border-[#A82218] shadow-md hover:scale-[1.02] transition-transform cursor-pointer relative group ring-2 ring-error/40">
+<!-- Left Anchor -->
+<div class="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#F9E6E4] border-2 border-[#BA1A1A]"></div>
+<div class="flex items-center justify-between mb-1">
+<span class="px-2 py-0.5 rounded bg-[#A82218] text-white text-label-code-sm font-label-code-sm font-bold animate-pulse">VIOLATION</span>
+<span class="text-caption-caps font-caption-caps text-[#A82218] font-bold">HIGH</span>
+</div>
+<div class="font-headline-sm text-headline-sm font-bold mt-1">CIS-NET-004 FAIL</div>
+<div class="text-label-code-sm font-label-code-sm text-[#731811] mt-1 font-semibold">Active Cleartext Vector</div>
+<div class="mt-2 text-caption-caps font-caption-caps bg-white/60 p-1 rounded border border-[#A82218]/20 flex items-center justify-between">
+<span>Score: CVSS 7.8</span>
+<span class="material-symbols-outlined text-sm" data-icon="flag">flag</span>
+</div>
+<!-- Right Anchor -->
+<div class="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#F9E6E4] border-2 border-[#344F1F]"></div>
+</div>
+<!-- Finding 2 -->
+<div class="w-[220px] bg-[#F9E6E4] text-[#731811] rounded-lg p-3 border border-[#A82218] shadow-sm hover:scale-[1.02] transition-transform cursor-pointer relative group">
+<!-- Left Anchor -->
+<div class="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#F9E6E4] border-2 border-[#BA1A1A]"></div>
+<div class="flex items-center justify-between mb-1">
+<span class="px-2 py-0.5 rounded bg-[#A82218] text-white text-label-code-sm font-label-code-sm font-bold">VIOLATION</span>
+<span class="text-caption-caps font-caption-caps text-[#A82218] font-bold">HIGH</span>
+</div>
+<div class="font-headline-sm text-headline-sm font-bold mt-1">DISA-NET-041 FAIL</div>
+<div class="text-label-code-sm font-label-code-sm text-[#731811] mt-1 font-semibold">Weak Credential Storage</div>
+<div class="mt-2 text-caption-caps font-caption-caps bg-white/60 p-1 rounded border border-[#A82218]/20 flex items-center justify-between">
+<span>Score: CVSS 7.2</span>
+<span class="material-symbols-outlined text-sm" data-icon="flag">flag</span>
+</div>
+<!-- Right Anchor -->
+<div class="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#F9E6E4] border-2 border-[#344F1F]"></div>
+</div>
+</div>
+<!-- ---------------- TIER 6: REMEDIATION PLAYBOOKS ---------------- -->
+<div class="flex flex-col justify-between h-[520px] py-12">
+<!-- Remediation 1 -->
+<div class="w-[240px] bg-[#344F1F] text-white rounded-lg p-3 border-2 border-[#283D18] shadow-md hover:scale-[1.02] transition-transform cursor-pointer relative group">
+<!-- Left Anchor -->
+<div class="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#344F1F] border-2 border-white"></div>
+<div class="flex items-center justify-between mb-1.5">
+<span class="px-2 py-0.5 rounded bg-white/10 text-secondary-fixed text-label-code-sm font-label-code-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-xs" data-icon="healing">healing</span>
+                  AUTOMATION
+                </span>
+<span class="text-caption-caps font-caption-caps text-secondary-fixed-dim">CLI PATCH</span>
+</div>
+<div class="font-headline-sm text-headline-sm font-bold text-white break-words">
+                cisco_vty_ssh_enforce.yaml
+              </div>
+<div class="text-label-code-sm font-label-code-sm text-secondary-fixed-dim mt-2 bg-black/20 p-1.5 rounded">
+<code>transport input ssh<br/>exec-timeout 10 0</code>
+</div>
+<div class="mt-2 pt-2 border-t border-white/20 flex items-center justify-between text-caption-caps font-caption-caps text-white/80">
+<span>Zero Downtime</span>
+<span class="text-emerald-300 font-bold">READY</span>
+</div>
+</div>
+<!-- Remediation 2 -->
+<div class="w-[240px] bg-[#344F1F] text-white rounded-lg p-3 border-2 border-[#283D18] shadow-md hover:scale-[1.02] transition-transform cursor-pointer relative group">
+<!-- Left Anchor -->
+<div class="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#344F1F] border-2 border-white"></div>
+<div class="flex items-center justify-between mb-1.5">
+<span class="px-2 py-0.5 rounded bg-white/10 text-secondary-fixed text-label-code-sm font-label-code-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-xs" data-icon="healing">healing</span>
+                  AUTOMATION
+                </span>
+<span class="text-caption-caps font-caption-caps text-secondary-fixed-dim">SECRET TYPE 8</span>
+</div>
+<div class="font-headline-sm text-headline-sm font-bold text-white break-words">
+                cisco_secret_type8_migrate.yaml
+              </div>
+<div class="text-label-code-sm font-label-code-sm text-secondary-fixed-dim mt-2 bg-black/20 p-1.5 rounded">
+<code>enable algorithm-type sha256 secret</code>
+</div>
+<div class="mt-2 pt-2 border-t border-white/20 flex items-center justify-between text-caption-caps font-caption-caps text-white/80">
+<span>Requires Re-auth</span>
+<span class="text-emerald-300 font-bold">READY</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Floating Legend & Status Pin in Canvas Bottom Left -->
+<div class="sticky left-6 bottom-6 mt-8 inline-flex items-center gap-4 bg-surface-container-lowest/95 backdrop-blur border border-[#D8CEB9] p-3 rounded-lg shadow-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="analytics">analytics</span>
+<div>
+<div class="text-caption-caps font-caption-caps text-on-surface/70">GRAPH STATUS</div>
+<div class="text-label-code-sm font-label-code-sm font-bold">14 Active Relations • 2 Severe Paths</div>
+</div>
+</div>
+<div class="w-px h-6 bg-[#D8CEB9]"></div>
+<div class="flex items-center gap-2 text-caption-caps font-caption-caps">
+<span class="flex items-center gap-1"><span class="w-2.5 h-1 bg-[#344F1F]"></span> Verified Causality</span>
+<span class="flex items-center gap-1"><span class="w-2.5 h-1 bg-[#BA1A1A]"></span> Violation Link</span>
+<span class="flex items-center gap-1"><span class="w-2.5 h-1 bg-[#F4991A]"></span> Normalized Fact</span>
+</div>
+</div>
+</main>
+<!-- ========================================================================= -->
+<!-- DOCKED RIGHT SIDE INSPECTION PANEL                                        -->
+<!-- ========================================================================= -->
+<aside class="w-96 bg-surface-container-lowest border-l border-[#D8CEB9] flex flex-col justify-between shadow-xl z-20 overflow-y-auto custom-scroll">
+<!-- Inspector Content -->
+<div class="p-space-lg">
+<!-- Header -->
+<div class="flex items-center justify-between pb-space-sm border-b border-[#E5DCC9]">
+<div>
+<span class="text-caption-caps font-caption-caps text-on-surface/70 uppercase">Inspection Sidecar</span>
+<h2 class="text-headline-sm font-headline-sm font-bold text-on-surface mt-0.5">
+                Node Inspector: CIS-NET-004 Finding
+              </h2>
+</div>
+<span class="px-2 py-0.5 rounded bg-[#F9E6E4] text-[#A82218] border border-[#A82218]/30 text-label-code-sm font-label-code-sm font-bold">FAIL</span>
+</div>
+<!-- Section: Causal Path Trace -->
+<div class="mt-space-lg">
+<h3 class="text-caption-caps font-caption-caps text-tertiary uppercase tracking-wider mb-2">Causal Propagation Chain</h3>
+<div class="bg-[#FAF7F2] border border-[#E5DCC9] rounded-lg p-3 space-y-2 text-label-code-sm font-label-code-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-[#344F1F]" data-icon="router">router</span>
+<span class="font-bold text-on-surface">Cisco-Core-01</span>
+<span class="text-tertiary text-xs">→</span>
+</div>
+<div class="flex items-center gap-2 pl-3">
+<span class="material-symbols-outlined text-sm text-tertiary" data-icon="description">description</span>
+<span class="text-on-surface">Snapshot v14.2</span>
+<span class="text-tertiary text-xs">→</span>
+</div>
+<div class="flex items-center gap-2 pl-6">
+<span class="material-symbols-outlined text-sm text-primary-container" data-icon="data_object">data_object</span>
+<span class="bg-[#FEF4E6] text-[#945806] px-1 py-0.5 rounded font-mono text-xs border border-[#F4991A]/30">remote_management.telnet = true</span>
+<span class="text-tertiary text-xs">→</span>
+</div>
+<div class="flex items-center gap-2 pl-9">
+<span class="material-symbols-outlined text-sm text-tertiary" data-icon="policy">policy</span>
+<span class="text-on-surface font-semibold">CIS-NET-004</span>
+<span class="text-tertiary text-xs">→</span>
+</div>
+<div class="flex items-center gap-2 pl-12 text-[#A82218] font-bold">
+<span class="material-symbols-outlined text-sm" data-icon="error">error</span>
+<span>Violation FAIL</span>
+<span class="text-tertiary text-xs">→</span>
+</div>
+<div class="flex items-center gap-2 pl-14 text-[#344F1F] font-bold">
+<span class="material-symbols-outlined text-sm" data-icon="play_circle">play_circle</span>
+<span>Remediation CLI</span>
+</div>
+</div>
+</div>
+<!-- Section: Blast Radius & Impact -->
+<div class="mt-space-lg">
+<h3 class="text-caption-caps font-caption-caps text-tertiary uppercase tracking-wider mb-2">Blast Radius Assessment</h3>
+<div class="bg-[#FDF2CC] border border-[#E5A827] rounded-lg p-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-amber-700" data-icon="warning">warning</span>
+<div class="text-headline-sm font-headline-sm font-bold text-on-surface">3 Affected Downstream Devices</div>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mt-1">
+                Cleartext Telnet exposure allows unencrypted credential interception traversing intermediate transit networks:
+              </p>
+<ul class="mt-2 space-y-1 text-label-code-sm font-label-code-sm text-on-surface">
+<li class="flex items-center justify-between py-0.5 border-b border-[#E5A827]/20">
+<span>• Cisco-Dist-Agg-01</span>
+<span class="text-caption-caps text-tertiary">10.240.10.1</span>
+</li>
+<li class="flex items-center justify-between py-0.5 border-b border-[#E5A827]/20">
+<span>• Cisco-Dist-Agg-02</span>
+<span class="text-caption-caps text-tertiary">10.240.10.2</span>
+</li>
+<li class="flex items-center justify-between py-0.5">
+<span>• Edge-Border-GW-01</span>
+<span class="text-caption-caps text-tertiary">10.240.254.254</span>
+</li>
+</ul>
+</div>
+</div>
+<!-- Section: Upstream Forensic Evidence -->
+<div class="mt-space-lg">
+<div class="flex items-center justify-between mb-2">
+<h3 class="text-caption-caps font-caption-caps text-tertiary uppercase tracking-wider">Upstream Evidence</h3>
+<span class="text-caption-caps font-caption-caps text-secondary font-bold">Line 142 of running config</span>
+</div>
+<div class="bg-[#1A2016] text-[#F9F5F0] rounded-lg p-3 font-mono text-label-code-sm overflow-x-auto shadow-inner">
+<div class="text-tertiary-fixed-dim/60"># /mnt/configs/cisco-core-01-running.cfg</div>
+<div class="text-tertiary-fixed-dim/80">140: line vty 0 4</div>
+<div class="text-tertiary-fixed-dim/80">141:  exec-timeout 15 0</div>
+<div class="bg-[#F4991A]/30 text-primary-container px-1 py-0.5 rounded border-l-2 border-primary-container">
+                142:  transport input telnet
+              </div>
+<div class="text-tertiary-fixed-dim/80">143:  transport output none</div>
+<div class="text-tertiary-fixed-dim/80">144:  stopbits 1</div>
+</div>
+<div class="mt-1 text-right">
+<a class="text-label-code-sm font-label-code-sm text-secondary hover:underline inline-flex items-center gap-1" href="#">
+<span>View Full Forensic Snapshot</span>
+<span class="material-symbols-outlined text-xs" data-icon="open_in_new">open_in_new</span>
+</a>
+</div>
+</div>
+<!-- Section: AI Remediation Strategy -->
+<div class="mt-space-lg">
+<h3 class="text-caption-caps font-caption-caps text-tertiary uppercase tracking-wider mb-2">Target Action Plan</h3>
+<div class="bg-surface-container-low border border-outline-variant rounded-lg p-3">
+<div class="flex items-center justify-between text-label-code-sm font-label-code-sm font-semibold text-secondary">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="check_circle">check_circle</span>
+                  Playbook Verified
+                </span>
+<span>Id: PB-CISCO-SSH-09</span>
+</div>
+<div class="text-body-sm font-body-sm text-on-surface-variant mt-1.5">
+                Automatically replaces <code class="bg-[#F2EAD3] px-1 rounded text-on-surface">transport input telnet</code> with <code class="bg-[#E7EFE0] px-1 rounded text-[#344F1F] font-semibold">transport input ssh</code> across VTY 0 to 15 without terminating active sessions.
+              </div>
+</div>
+</div>
+</div>
+<!-- Sticky Footer Action -->
+<div class="p-space-lg bg-[#FAF7F2] border-t border-[#D8CEB9] space-y-2">
+<button class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-primary-container text-on-primary-container font-headline-sm text-headline-sm font-bold border border-[#DF860D] shadow hover:brightness-95 transition-all">
+<span class="material-symbols-outlined" data-icon="play_arrow">play_arrow</span>
+<span>Trigger Auto-Remediation Playbook</span>
+</button>
+<div class="flex items-center justify-between">
+<button class="text-label-code-sm font-label-code-sm text-tertiary hover:text-on-surface transition-colors">
+              Dismiss Finding
+            </button>
+<button class="text-label-code-sm font-label-code-sm text-secondary hover:underline">
+              Create Jira Ticket
+            </button>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</body></html>
