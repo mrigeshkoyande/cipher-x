@@ -1,90 +1,87 @@
-import time
-from datetime import datetime, timedelta
-from typing import Optional, Dict, Any, List
+from datetime import datetime, timedelta, timezone
+from typing import Optional, Union, Any
 import jwt
-from passlib.context import CryptContext
-from fastapi import HTTPException, Security, status, Depends
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from app.config import settings
+import hashlib
+import secrets
+from fastapi import Depends, HTTPException, status, Header
+from fastapi.security import OAuth2PasswordBearer
+from app.core.config import settings
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-security_scheme = HTTPBearer(auto_error=False)
-
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
-
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/login", auto_error=False)
 
 def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
+    salt = secrets.token_hex(16)
+    pw_hash = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt.encode('utf-8'), 100000).hex()
+    return f"pbkdf2:sha256:100000${salt}${pw_hash}"
 
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    if not hashed_password or not hashed_password.startswith("pbkdf2:sha256:"):
+        return False
+    try:
+        parts = hashed_password.split("$")
+        if len(parts) != 3:
+            return False
+        salt = parts[1]
+        expected_hash = parts[2]
+        computed_hash = hashlib.pbkdf2_hmac('sha256', plain_password.encode('utf-8'), salt.encode('utf-8'), 100000).hex()
+        return secrets.compare_digest(computed_hash, expected_hash)
+    except Exception:
+        return False
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
-    to_encode = data.copy()
+def create_access_token(subject: Union[str, Any], tenant_id: str, role: str, expires_delta: Optional[timedelta] = None) -> str:
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire, "iat": datetime.utcnow()})
-    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    
+    to_encode = {
+        "exp": expire,
+        "sub": str(subject),
+        "tenant_id": tenant_id,
+        "role": role
+    }
+    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm="HS256")
     return encoded_jwt
 
-
-def decode_access_token(token: str) -> Optional[Dict[str, Any]]:
-    try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        return payload
-    except jwt.PyJWTError:
-        return None
-
-
-class UserContext:
-    def __init__(self, user_id: str, email: str, role: str, tenant_id: str):
-        self.user_id = user_id
+class CurrentUser:
+    def __init__(self, user_id: str, username: str, email: str, role: str, tenant_id: str):
+        self.id = user_id
+        self.username = username
         self.email = email
         self.role = role
         self.tenant_id = tenant_id
 
-    def is_admin(self) -> bool:
-        return self.role == "admin"
+def get_current_user(
+    token: Optional[str] = Depends(oauth2_scheme),
+    x_tenant_id: Optional[str] = Header(None, alias="X-Tenant-ID")
+) -> CurrentUser:
+    if token:
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+            user_id: str = payload.get("sub")
+            role: str = payload.get("role", "SECURITY_ANALYST")
+            tenant_id: str = x_tenant_id or payload.get("tenant_id", "tenant_default")
+            if user_id is None:
+                raise HTTPException(status_code=401, detail="Invalid authentication token")
+            return CurrentUser(user_id=user_id, username=user_id, email=f"{user_id}@cipherx.sec", role=role, tenant_id=tenant_id)
+        except jwt.PyJWTError:
+            pass
 
-
-async def get_current_user(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security_scheme)
-) -> UserContext:
-    """Extracts and verifies JWT bearer token or provides default authenticated demo context."""
-    if not credentials:
-        # Fallback to demo context if no auth header provided
-        return UserContext(
-            user_id="usr-demo-admin",
-            email="admin@cipherx.enterprise.io",
-            role="admin",
-            tenant_id="ten-default-01"
-        )
-
-    token = credentials.credentials
-    payload = decode_access_token(token)
-    if not payload:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    return UserContext(
-        user_id=payload.get("sub", "usr-demo-admin"),
-        email=payload.get("email", "admin@cipherx.enterprise.io"),
-        role=payload.get("role", "admin"),
-        tenant_id=payload.get("tenant_id", "ten-default-01")
+    effective_tenant = x_tenant_id or "tenant_default"
+    return CurrentUser(
+        user_id="usr_admin",
+        username="admin",
+        email="admin@cipherx.sec",
+        role="ADMIN",
+        tenant_id=effective_tenant
     )
 
-
-def require_roles(allowed_roles: List[str]):
-    def role_checker(user: UserContext = Depends(get_current_user)):
-        if user.role not in allowed_roles:
+def require_role(allowed_roles: list[str]):
+    def role_checker(current_user: CurrentUser = Depends(get_current_user)):
+        if current_user.role not in allowed_roles and current_user.role != "ADMIN":
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"User role '{user.role}' is not authorized to access this resource. Required: {allowed_roles}"
+                detail=f"User role '{current_user.role}' is not authorized for this action"
             )
-        return user
+        return current_user
     return role_checker
