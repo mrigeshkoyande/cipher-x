@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cipherx-config
+  namespace: cipher-x
+  labels:
+    app.kubernetes.io/name: cipher-x
+    app.kubernetes.io/component: configuration
+data:
+  ENVIRONMENT: "production"
+  APP_NAME: "Cipher-X Security & Compliance Platform"
+  APP_VERSION: "3.0.0"
+  API_V1_PREFIX: "/api/v1"
+  STORAGE_TYPE: "local"
+  RATE_LIMIT_PER_MINUTE: "120"
+  AI_PROVIDER: "deterministic_grounded"
+  POSTGRES_HOST: "cipherx-db"
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: "cipherx"
+  POSTGRES_USER: "cipherx"
+  REDIS_URL: "redis://cipherx-redis:6379/0"
