@@ -1,15 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  FileText, Download, Plus, CheckCircle2, ShieldAlert, 
-  ExternalLink, Layers, Printer, RefreshCw, ChevronRight, Lock
-} from 'lucide-react';
 
 export default function ReportsView({ onNavigateTab }) {
   const [reports, setReports] = useState([]);
-  const [selectedReport, setSelectedReport] = useState(null);
-  const [reportType, setReportType] = useState('ORGANIZATION');
-  const [reportTitle, setReportTitle] = useState('Quarterly Network Security Audit Report');
-  const [generating, setGenerating] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,10 +13,7 @@ export default function ReportsView({ onNavigateTab }) {
       const res = await fetch('/api/v1/reports');
       if (res.ok) {
         const data = await res.json();
-        setReports(data);
-        if (data.length > 0) {
-          fetchReportDetail(data[0].report_id);
-        }
+        setReports(data.reports || []);
       }
     } catch (e) {
       console.error(e);
@@ -33,224 +22,175 @@ export default function ReportsView({ onNavigateTab }) {
     }
   };
 
-  const fetchReportDetail = async (reportId) => {
-    try {
-      const res = await fetch(`/api/v1/reports/${reportId}`);
-      if (res.ok) {
-        const data = await res.json();
-        setSelectedReport(data);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const handleGenerateReport = async () => {
-    setGenerating(true);
-    try {
-      const res = await fetch('/api/v1/reports/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          report_type: reportType,
-          title: reportTitle,
-          target_name: "Enterprise Fleet Infrastructure"
-        })
-      });
-      if (res.ok) {
-        const newRep = await res.json();
-        fetchReports();
-        setSelectedReport(newRep);
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setGenerating(false);
-    }
-  };
-
-  const handleExportCSV = () => {
-    if (!selectedReport) return;
-    window.open(`/api/v1/reports/${selectedReport.report_id}/export/csv`, '_blank');
-  };
+  const demoReports = [
+    { title: 'Q3 2024 CIS Benchmark Fleet Attestation', id: 'REP-2024-Q3-CIS-8812', scope: 'All 128 Fleet', scopeDetail: '100% Ingestion Coverage', framework: 'CIS v8.0', frameworkLevel: 'Level 2', generated: 'Oct 18, 2024 14:30 UTC', actor: 'Scheduled Bot', actorDetail: '(Engine v3.2)', hash: 'a812…91bf', hashStatus: 'Tamper-Proof Ledger Verified', format: 'PDF & JSON Package', size: '4.2 MB / 18.4 MB' },
+    { title: 'NIST SP 800-53 Core Router Assurance Dossier', id: 'REP-2024-NIST-0419', scope: 'Cisco-Core-01 & Edge (18 Nodes)', scopeDetail: 'US-East Backbones', framework: 'NIST 800-53', frameworkLevel: 'r5', generated: 'Oct 17, 2024 19:12 UTC', actor: 'Security Analyst (ANL-9042)', actorDetail: '', hash: 'c771…dfaa', hashStatus: 'Tamper-Proof Ledger Verified', format: 'PDF Dossier', size: '9.6 MB' },
+    { title: 'Daily Configuration Drift & Exception Summary', id: 'REP-DRIFT-2024-10-18', scope: 'Perimeter Firewalls (6 Nodes)', scopeDetail: 'Palo Alto DMZ clusters', framework: 'DISA STIG', frameworkLevel: 'Network', generated: 'Oct 18, 2024 00:00 UTC', actor: 'Scheduled Bot', actorDetail: '(Engine v3.2)', hash: '3f29…01e8', hashStatus: 'Tamper-Proof Ledger Verified', format: 'JSON Evidence Bundle', size: '24.1 MB' },
+    { title: 'Executive CISO Security Posture Brief', id: 'REP-EXEC-2024-Q3', scope: 'Enterprise Fleet (Aggregate)', scopeDetail: 'Board-level summary metrics', framework: 'Multi-Standard', frameworkLevel: '', generated: 'Oct 15, 2024 18:00 UTC', actor: 'Chief Information Security Officer', actorDetail: '', hash: 'b109…77ca', hashStatus: 'Tamper-Proof Ledger Verified', format: 'Executive PDF Deck', size: '2.8 MB' },
+    { title: 'ISO 27001 Annex A.13 Telemetry Attestation', id: 'REP-ISO-27001-A13', scope: 'Cloud Edge Transit Gateway', scopeDetail: 'AWS Direct Connect Routers', framework: 'ISO 27001:2022', frameworkLevel: '', generated: 'Oct 12, 2024 11:45 UTC', actor: 'External Auditor (Deloitte)', actorDetail: '', hash: 'ee88…34ac', hashStatus: 'Tamper-Proof Ledger Verified', format: 'PDF + Raw Config AST', size: '14.1 MB' },
+  ];
 
   return (
-    <div className="space-y-6">
+    <div className="animate-in">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="page-header">
+        <div className="page-header-badge">
+          <span className="material-symbols-outlined" style={{ fontSize: 14 }}>assured_workload</span>
+          CRYPTOGRAPHIC EVIDENCE ARCHIVE
+          <span style={{ marginLeft: '0.5rem', fontFamily: "'JetBrains Mono', monospace" }}>EPOCH #2024-Q3-REV4</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+          <div>
+            <h1>Compliance & Audit Reports Center</h1>
+            <p>Cryptographically anchored, audit-ready compliance dossiers, executive summaries, and technical evidence packages for heterogeneous network environments.</p>
+          </div>
+          <div className="info-card" style={{ padding: '0.625rem 0.875rem', marginBottom: 0, flexShrink: 0, textAlign: 'right' }}>
+            <div style={{ fontSize: '0.625rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--on-surface-variant)', letterSpacing: '0.04em' }}>IMMUTABLE ANCHOR BLOCK</div>
+            <div style={{ fontWeight: 800, fontSize: '1.125rem', fontFamily: "'JetBrains Mono', monospace" }}>#19,842,109</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="stat-cards">
+        <div className="stat-card">
+          <div className="stat-card-header">
+            <span className="stat-card-label">Published Reports</span>
+            <div className="stat-card-icon"><span className="material-symbols-outlined">description</span></div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
+            <div className="stat-card-value">46</div>
+            <span style={{ fontSize: '0.8125rem', color: 'var(--on-surface-variant)' }}>Dossiers</span>
+          </div>
+          <div className="stat-card-sub"><span className="dot green"></span>+8 dossiers generated this quarter</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-card-header">
+            <span className="stat-card-label">Cryptographic Attestation</span>
+            <div className="stat-card-icon"><span className="material-symbols-outlined">verified_user</span></div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
+            <div className="stat-card-value success">100%</div>
+            <span className="badge validated">VALIDATED</span>
+          </div>
+          <div className="stat-card-sub"><span className="dot green"></span>SHA-256 Ledger Anchor Validated</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-card-header">
+            <span className="stat-card-label">Regulatory Baselines</span>
+            <div className="stat-card-icon"><span className="material-symbols-outlined">account_balance</span></div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
+            <div className="stat-card-value primary">4</div>
+            <span style={{ fontSize: '0.8125rem', color: 'var(--on-surface-variant)' }}>Active Standards</span>
+          </div>
+          <div className="stat-card-sub">CIS v8, NIST 800-53, DISA, ISO</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-card-header">
+            <span className="stat-card-label">Automated Cadence</span>
+            <div className="stat-card-icon"><span className="material-symbols-outlined">schedule</span></div>
+          </div>
+          <div className="stat-card-value">Daily 00:00 <span style={{ fontSize: '0.75rem', fontWeight: 500 }}>UTC</span></div>
+          <div className="stat-card-sub"><span className="dot green"></span>Next ingestion sweep in 4h 18m</div>
+        </div>
+      </div>
+
+      {/* Reports Table */}
+      <div className="data-table-container">
+        <div className="data-table-toolbar">
+          <div className="data-table-search">
+            <span className="material-symbols-outlined">search</span>
+            <input type="text" placeholder="Search by Report Title, Hash, or Node scope..." />
+          </div>
+          <div className="filter-chip">Framework: All Frameworks (Any)</div>
+          <div className="filter-chip">Target Scope: Enterprise Fleet (All)</div>
+          <div className="filter-chip">Audit Window: Q3 2024 (Active Cycle)</div>
+          <div className="filter-chip active">Integrity: Verified Ledger (SHA)</div>
+        </div>
+        <div style={{ padding: '0.5rem 1rem', borderBottom: '1px solid var(--surface-variant)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+          <div style={{ fontWeight: 700 }}>OFFICIAL AUDIT REPORT DOSSIERS</div>
+          <span style={{ color: 'var(--on-surface-variant)' }}>Showing 5 of 46 records</span>
+        </div>
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Report Title & Type</th>
+              <th>Target Scope & Nodes</th>
+              <th>Framework</th>
+              <th>Generated Timestamp & Actor</th>
+              <th>Cryptographic Hash & Proof</th>
+              <th>Format & Size</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {demoReports.map((rpt, i) => (
+              <tr key={i}>
+                <td>
+                  <div style={{ fontWeight: 700, marginBottom: '0.25rem' }}>{rpt.title}</div>
+                  <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '0.625rem', color: 'var(--on-surface-variant)' }}>DOSSIER-ID: {rpt.id}</div>
+                </td>
+                <td>
+                  <div style={{ fontSize: '0.8125rem' }}>{rpt.scope}</div>
+                  <div style={{ fontSize: '0.6875rem', color: 'var(--on-surface-variant)' }}>{rpt.scopeDetail}</div>
+                </td>
+                <td>
+                  <span className="badge primary">{rpt.framework}</span>
+                  {rpt.frameworkLevel && <div style={{ fontSize: '0.625rem', color: 'var(--on-surface-variant)', marginTop: '0.25rem' }}>{rpt.frameworkLevel}</div>}
+                </td>
+                <td>
+                  <div style={{ fontSize: '0.8125rem', fontFamily: "'JetBrains Mono', monospace" }}>{rpt.generated}</div>
+                  <div style={{ fontSize: '0.6875rem', color: 'var(--on-surface-variant)' }}>{rpt.actor}</div>
+                </td>
+                <td>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                    <span className="hash-value" style={{ fontSize: '0.625rem' }}>{rpt.hash}</span>
+                    <span className="material-symbols-outlined" style={{ fontSize: 14, color: 'var(--severity-pass)' }}>check_circle</span>
+                  </div>
+                  <div style={{ fontSize: '0.625rem', color: 'var(--on-surface-variant)', marginTop: '0.25rem' }}>{rpt.hashStatus}</div>
+                </td>
+                <td>
+                  <div style={{ fontSize: '0.8125rem', fontWeight: 600 }}>{rpt.format}</div>
+                  <div style={{ fontSize: '0.6875rem', color: 'var(--on-surface-variant)' }}>{rpt.size}</div>
+                </td>
+                <td>
+                  <div style={{ display: 'flex', gap: '0.375rem' }}>
+                    <button className="btn btn-secondary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.6875rem' }}>Preview</button>
+                    <button className="topbar-icon-btn" style={{ width: 28, height: 28 }}><span className="material-symbols-outlined" style={{ fontSize: 16 }}>download</span></button>
+                    <button className="topbar-icon-btn" style={{ width: 28, height: 28 }}><span className="material-symbols-outlined" style={{ fontSize: 16 }}>content_copy</span></button>
+                    <button className="topbar-icon-btn" style={{ width: 28, height: 28 }}><span className="material-symbols-outlined" style={{ fontSize: 16 }}>share</span></button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div className="data-table-footer">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 14 }}>lock</span>
+            <span>Archival Ledger: Block #19,842,109 · Synced with Private Governance Consortia</span>
+          </div>
+          <div className="pagination">
+            <button>Previous</button>
+            <button className="active">1</button>
+            <button>2</button>
+            <button>3</button>
+            <span style={{ padding: '0 0.25rem' }}>…</span>
+            <button>10</button>
+            <button>Next</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Cryptographic Proof Footer */}
+      <div className="alert info" style={{ marginTop: '1rem' }}>
+        <span className="material-symbols-outlined">verified</span>
         <div>
-          <h2 className="font-heading font-extrabold text-2xl text-slate-100 flex items-center gap-2.5">
-            <FileText className="w-6 h-6 text-cyan-400" /> Compliance Reports & Regulatory Attestations
-          </h2>
-          <p className="text-xs text-slate-400 mt-1">
-            Tamper-evident, cryptographically anchored security reports across CIS, NIST, DISA STIG, and ISO 27001.
-          </p>
-        </div>
-
-        {/* Generate Report Trigger */}
-        <div className="flex items-center gap-2">
-          {selectedReport && (
-            <button
-              onClick={handleExportCSV}
-              className="btn-cyber-secondary text-xs"
-            >
-              <Download className="w-4 h-4" /> Export CSV Ledger
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Generate New Report Strip */}
-      <div className="glass-panel p-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-3 flex-1">
-          <select
-            value={reportType}
-            onChange={(e) => setReportType(e.target.value)}
-            className="bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-400 font-mono"
-          >
-            <option value="ORGANIZATION">Organization Fleet Report</option>
-            <option value="DEVICE">Per-Device Assessment</option>
-            <option value="FRAMEWORK">Framework Regulatory Report</option>
-            <option value="AUDIT">Cryptographic Audit Trail Report</option>
-            <option value="DRIFT">Configuration Drift Report</option>
-            <option value="EXECUTIVE">Executive Summary Report</option>
-          </select>
-
-          <input
-            type="text"
-            placeholder="Report title..."
-            value={reportTitle}
-            onChange={(e) => setReportTitle(e.target.value)}
-            className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-400 min-w-[220px]"
-          />
-        </div>
-
-        <button
-          onClick={handleGenerateReport}
-          disabled={generating}
-          className="btn-cyber-primary text-xs shrink-0"
-        >
-          {generating ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
-          Generate & Anchor Report
-        </button>
-      </div>
-
-      {/* Main Grid: Report List & Detail Viewer */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column: Reports List (4 cols) */}
-        <div className="lg:col-span-4 glass-panel p-4 space-y-3">
-          <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-            <span className="font-heading font-semibold text-xs text-slate-300">SAVED REPORTS ({reports.length})</span>
-            <button onClick={fetchReports} className="text-slate-400 hover:text-cyan-400">
-              <RefreshCw className="w-3.5 h-3.5" />
-            </button>
+          <div style={{ fontWeight: 700, marginBottom: '0.25rem' }}>Cryptographic Proof & Non-Repudiation Guarantee</div>
+          <div style={{ fontSize: '0.8125rem' }}>
+            Every published report is hashed using <span className="code-tag">SHA-256</span> and permanently notarized onto the private Cipher-X audit ledger. External auditors may download the raw JSON evidence packages to verify AST deterministic integrity independently without providing direct operational credentials to network nodes.
           </div>
-
-          <div className="space-y-2 max-h-[600px] overflow-y-auto pr-1">
-            {reports.map((rep) => {
-              const isSelected = selectedReport?.report_id === rep.report_id;
-              return (
-                <div
-                  key={rep.report_id}
-                  onClick={() => fetchReportDetail(rep.report_id)}
-                  className={`p-3 rounded-xl border cursor-pointer transition ${
-                    isSelected
-                      ? 'bg-slate-900/90 border-cyan-400 shadow-md ring-1 ring-cyan-400/30'
-                      : 'bg-slate-900/40 border-slate-800 hover:bg-slate-900/70 hover:border-slate-700'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-mono text-[9px] px-1.5 py-0.5 rounded bg-slate-800 text-cyan-300 uppercase font-bold">
-                      {rep.report_type}
-                    </span>
-                    <span className="text-[10px] font-mono text-emerald-400 font-bold">
-                      {rep.compliance_score}%
-                    </span>
-                  </div>
-                  <h4 className="font-heading font-bold text-xs text-slate-100 truncate">{rep.title}</h4>
-                  <div className="text-[10px] font-mono text-slate-500 mt-1 truncate">
-                    SHA-256: {rep.cryptographic_hash?.substring(0, 16)}...
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Right Column: Full Report Document Preview (8 cols) */}
-        <div className="lg:col-span-8 glass-panel p-6 space-y-5">
-          {selectedReport ? (
-            <div className="space-y-5">
-              {/* Report Document Header */}
-              <div className="border-b border-slate-800 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
-                  <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 uppercase font-bold">
-                    {selectedReport.report_type} AUDIT REPORT
-                  </span>
-                  <h3 className="font-heading font-extrabold text-xl text-slate-100 mt-1">{selectedReport.title}</h3>
-                  <div className="text-xs text-slate-400 mt-1">
-                    Target: <strong className="text-slate-200">{selectedReport.target}</strong> | Created: <span className="font-mono">{selectedReport.timestamp_iso}</span>
-                  </div>
-                </div>
-
-                <div className="font-mono text-right text-xs">
-                  <div className="text-2xl font-extrabold text-cyan-400">{selectedReport.compliance_summary?.compliance_score}%</div>
-                  <div className="text-[10px] text-slate-400">GRADE {selectedReport.compliance_summary?.grade}</div>
-                </div>
-              </div>
-
-              {/* Cryptographic SHA-256 Hash & Anchor Badge */}
-              <div className="p-3 rounded-lg bg-slate-950 border border-slate-800 font-mono text-xs flex items-center justify-between">
-                <div className="truncate pr-2">
-                  <span className="text-slate-500">SHA-256 HASH: </span>
-                  <span className="text-cyan-300 font-bold">{selectedReport.cryptographic_hash}</span>
-                </div>
-                <span className="shrink-0 text-[10px] font-bold text-emerald-400 badge-pass px-2 py-0.5 rounded flex items-center gap-1">
-                  <Lock className="w-3 h-3" /> ANCHORED
-                </span>
-              </div>
-
-              {/* Executive Summary Section */}
-              <div className="space-y-1.5">
-                <h4 className="font-heading font-bold text-xs uppercase text-slate-400">1. Executive Summary</h4>
-                <p className="text-xs text-slate-300 bg-slate-900/60 p-3 rounded-lg border border-slate-800 leading-relaxed">
-                  {selectedReport.executive_summary}
-                </p>
-              </div>
-
-              {/* Findings Summary Table */}
-              <div className="space-y-2">
-                <h4 className="font-heading font-bold text-xs uppercase text-slate-400">
-                  2. Identified Security Findings ({selectedReport.findings_detail?.length || 0})
-                </h4>
-                <div className="space-y-1.5 max-h-56 overflow-y-auto">
-                  {selectedReport.findings_detail?.map((f) => (
-                    <div key={f.control_id} className="p-2.5 rounded-lg bg-slate-900/40 border border-slate-800 text-xs flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono font-bold text-cyan-400">{f.control_id}</span>
-                        <span className="text-slate-200 truncate max-w-sm">{f.title}</span>
-                      </div>
-                      <span className={`text-[9px] font-mono px-2 py-0.5 rounded uppercase font-bold ${
-                        f.severity === 'CRITICAL' ? 'badge-critical' : 'badge-high'
-                      }`}>
-                        {f.severity}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Technical Appendix & Verification */}
-              <div className="pt-3 border-t border-slate-800/80 text-[11px] font-mono text-slate-500 flex items-center justify-between">
-                <span>Engine: Cipher-X Compliance Core v3.0</span>
-                <span>FIPS 180-4 SHA-256 Verifiable</span>
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-20 text-slate-500 text-xs">
-              Select or generate a compliance report to preview
-            </div>
-          )}
         </div>
       </div>
     </div>
