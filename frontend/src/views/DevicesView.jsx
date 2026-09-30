@@ -1,19 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Server, Plus, Upload, CheckCircle2, XCircle, AlertTriangle, 
-  HelpCircle, Eye, GitCommit, FileText, ChevronRight, Shield, RefreshCw
-} from 'lucide-react';
 
 export default function DevicesView({ selectedDeviceId, onSelectDevice, onNavigateTab }) {
   const [devices, setDevices] = useState([]);
-  const [selectedDevice, setSelectedDevice] = useState(null);
-  const [activeConfigTab, setActiveConfigTab] = useState('findings');
-  const [showUploadModal, setShowUploadModal] = useState(false);
-  const [uploadText, setUploadText] = useState('');
-  const [versionLabel, setVersionLabel] = useState('v2.0');
-  const [changeReason, setChangeReason] = useState('Scheduled configuration update');
-  const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [selectedDevice, setSelectedDevice] = useState(null);
 
   useEffect(() => {
     fetchDevices();
@@ -24,337 +14,157 @@ export default function DevicesView({ selectedDeviceId, onSelectDevice, onNaviga
       const res = await fetch('/api/v1/devices');
       if (res.ok) {
         const data = await res.json();
-        setDevices(data);
-        if (selectedDeviceId) {
-          fetchDeviceDetail(selectedDeviceId);
-        } else if (data.length > 0) {
-          fetchDeviceDetail(data[0].id);
-        }
+        setDevices(data.devices || []);
       }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
+    } catch (e) { console.error(e); }
+    finally { setLoading(false); }
   };
 
-  const fetchDeviceDetail = async (id) => {
-    try {
-      const res = await fetch(`/api/v1/devices/${id}`);
-      if (res.ok) {
-        const data = await res.json();
-        setSelectedDevice(data);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
+  const demoDevices = [
+    { id: 'DEV-001', hostname: 'Cisco-Core-01', ip: '10.240.0.1', vendor: 'Cisco', platform: 'IOS-XE', model: 'Catalyst 9600', location: 'DC-East Rack 04', configVersion: 'v14.2', complianceScore: 68, status: 'DRIFT', lastIngestion: '2h ago', findings: { critical: 4, high: 7, medium: 3 } },
+    { id: 'DEV-002', hostname: 'FortiGate-DC-01', ip: '10.240.1.254', vendor: 'Fortinet', platform: 'FortiOS 7.4', model: 'FortiGate 600F', location: 'DC-East Perimeter', configVersion: 'v8.1', complianceScore: 72, status: 'NON-COMPLIANT', lastIngestion: '4h ago', findings: { critical: 2, high: 5, medium: 4 } },
+    { id: 'DEV-003', hostname: 'Aruba-Access-12', ip: '10.240.12.8', vendor: 'Aruba', platform: 'AOS-CX 10.12', model: 'CX 6300', location: 'Building 8 Floor 2', configVersion: 'v3.8', complianceScore: 81, status: 'WARNING', lastIngestion: '6h ago', findings: { critical: 1, high: 3, medium: 2 } },
+    { id: 'DEV-004', hostname: 'PAN-FW-Edge-01', ip: '10.240.254.1', vendor: 'Palo Alto', platform: 'PAN-OS 11.1', model: 'PA-5260', location: 'DC-West Edge', configVersion: 'v22.3', complianceScore: 85, status: 'COMPLIANT', lastIngestion: '1h ago', findings: { critical: 0, high: 2, medium: 1 } },
+    { id: 'DEV-005', hostname: 'Juniper-Border-01', ip: '10.240.100.1', vendor: 'Juniper', platform: 'Junos 23.4R1', model: 'MX304', location: 'DC-East Core', configVersion: 'v6.2', complianceScore: 78, status: 'NON-COMPLIANT', lastIngestion: '3h ago', findings: { critical: 1, high: 4, medium: 2 } },
+    { id: 'DEV-006', hostname: 'Cisco-Dist-Agg-01', ip: '10.240.10.1', vendor: 'Cisco', platform: 'NX-OS 10.3', model: 'Nexus 9300', location: 'DC-East Distribution', configVersion: 'v11.0', complianceScore: 91, status: 'COMPLIANT', lastIngestion: '2h ago', findings: { critical: 0, high: 1, medium: 0 } },
+  ];
 
-  const handleUploadConfig = async () => {
-    if (!uploadText.trim() || !selectedDevice) return;
-    setUploading(true);
-    try {
-      const res = await fetch('/api/v1/configurations/upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          device_id: selectedDevice.id,
-          raw_config: uploadText,
-          version_label: versionLabel,
-          change_reason: changeReason
-        })
-      });
-      if (res.ok) {
-        setShowUploadModal(false);
-        setUploadText('');
-        fetchDevices();
-        fetchDeviceDetail(selectedDevice.id);
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setUploading(false);
-    }
-  };
+  const displayDevices = devices.length > 0 ? devices : demoDevices;
 
-  const evalData = selectedDevice?.latest_evaluation || {};
-  const findings = evalData.findings || [];
-  const passed = evalData.passed_controls || [];
-  const configs = selectedDevice?.configurations || [];
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div style={{ textAlign: 'center' }}>
+          <div className="loading-spinner"></div>
+          <div className="loading-text">Loading Device Inventory...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="font-heading font-extrabold text-2xl text-slate-100 flex items-center gap-2.5">
-            <Server className="w-6 h-6 text-cyan-400" /> Managed Network Fleet & Config Repository
-          </h2>
-          <p className="text-xs text-slate-400 mt-1">
-            Real-time compliance evaluations, configuration revision history, and exact line-level evidence.
-          </p>
+    <div className="animate-in">
+      <div className="page-header">
+        <div className="page-header-badge">
+          <span className="material-symbols-outlined" style={{ fontSize: 14 }}>dns</span>
+          NETWORK ASSET INVENTORY
         </div>
-
-        <button 
-          onClick={() => setShowUploadModal(true)}
-          className="btn-cyber-primary text-xs self-start"
-        >
-          <Upload className="w-4 h-4" /> Upload Configuration Revision
-        </button>
-      </div>
-
-      {/* Main Grid: Device List & Detail Inspector */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column: Device Inventory (4 cols) */}
-        <div className="lg:col-span-4 glass-panel p-4 space-y-3">
-          <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-            <span className="font-heading font-semibold text-xs text-slate-300">DEVICES ({devices.length})</span>
-            <button onClick={fetchDevices} className="text-slate-400 hover:text-cyan-400">
-              <RefreshCw className="w-3.5 h-3.5" />
-            </button>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+          <div>
+            <h1>Devices & Configurations</h1>
+            <p>Managed network infrastructure inventory with live configuration ingestion, compliance scoring, and vendor-specific security posture assessment.</p>
           </div>
-
-          <div className="space-y-2 max-h-[650px] overflow-y-auto pr-1">
-            {devices.map((dev) => {
-              const isSelected = selectedDevice?.id === dev.id;
-              return (
-                <div
-                  key={dev.id}
-                  onClick={() => fetchDeviceDetail(dev.id)}
-                  className={`p-3 rounded-xl border cursor-pointer transition ${
-                    isSelected
-                      ? 'bg-slate-900/90 border-cyan-400 shadow-md ring-1 ring-cyan-400/30'
-                      : 'bg-slate-900/40 border-slate-800 hover:bg-slate-900/70 hover:border-slate-700'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 uppercase font-semibold">
-                      {dev.vendor}
-                    </span>
-                    <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold ${
-                      dev.grade === 'A' ? 'badge-pass' : (dev.grade === 'B' ? 'badge-medium' : 'badge-critical')
-                    }`}>
-                      {dev.compliance_score}% (Gr. {dev.grade})
-                    </span>
-                  </div>
-                  <h4 className="font-heading font-bold text-xs text-slate-100 truncate">{dev.name}</h4>
-                  <div className="text-[11px] font-mono text-slate-400 mt-1 flex items-center justify-between">
-                    <span>{dev.ip_address}</span>
-                    <span className="text-red-400">{dev.critical_findings || 0} Critical</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Right Column: Selected Device Detail & Findings (8 cols) */}
-        <div className="lg:col-span-8 glass-panel p-5 space-y-4">
-          {selectedDevice ? (
-            <div className="space-y-4">
-              {/* Device Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-heading font-extrabold text-xl text-slate-100">{selectedDevice.name}</h3>
-                    <span className="font-mono text-xs px-2 py-0.5 rounded bg-slate-800 text-cyan-400 uppercase font-bold">
-                      {selectedDevice.vendor}
-                    </span>
-                  </div>
-                  <div className="text-xs text-slate-400 mt-1 flex flex-wrap items-center gap-3">
-                    <span>IP: <strong className="text-slate-200 font-mono">{selectedDevice.ip_address}</strong></span>
-                    <span>Model: <strong className="text-slate-200">{selectedDevice.model}</strong></span>
-                    <span>Location: <strong className="text-slate-200">{selectedDevice.location}</strong></span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 self-start">
-                  <div className="text-right font-mono">
-                    <div className="text-2xl font-extrabold text-cyan-400">{evalData.compliance_score}%</div>
-                    <div className="text-[10px] text-slate-400 uppercase">Risk Score: {evalData.device_risk_score} pts</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Explainable Score Explanation Banner */}
-              <div className="p-3 rounded-lg bg-slate-900/90 border border-cyan-500/20 text-xs text-slate-300">
-                <span className="font-semibold text-cyan-300">Explainable Evaluation: </span>
-                {evalData.score_explanation || "Evaluation metrics computed dynamically."}
-              </div>
-
-              {/* View Subtabs */}
-              <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
-                <button
-                  onClick={() => setActiveConfigTab('findings')}
-                  className={`px-3 py-1 rounded text-xs font-semibold transition ${
-                    activeConfigTab === 'findings' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40' : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  Findings ({findings.length})
-                </button>
-                <button
-                  onClick={() => setActiveConfigTab('passed')}
-                  className={`px-3 py-1 rounded text-xs font-semibold transition ${
-                    activeConfigTab === 'passed' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  Passed Controls ({passed.length})
-                </button>
-                <button
-                  onClick={() => setActiveConfigTab('history')}
-                  className={`px-3 py-1 rounded text-xs font-semibold transition ${
-                    activeConfigTab === 'history' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/40' : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  Config Versions ({configs.length})
-                </button>
-              </div>
-
-              {/* Tab: Non-compliant Findings */}
-              {activeConfigTab === 'findings' && (
-                <div className="space-y-3 max-h-[450px] overflow-y-auto pr-1">
-                  {findings.length === 0 ? (
-                    <div className="text-center py-12 text-emerald-400 text-xs flex flex-col items-center gap-2">
-                      <CheckCircle2 className="w-8 h-8" />
-                      <span>Zero non-compliant findings! Device meets 100% of applicable controls.</span>
-                    </div>
-                  ) : (
-                    findings.map((f) => (
-                      <div key={f.control_id} className="p-3.5 rounded-lg bg-slate-900/60 border border-slate-800 space-y-2">
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono text-xs font-bold text-cyan-400">{f.control_id}</span>
-                            <span className="font-medium text-xs text-slate-200">{f.title}</span>
-                          </div>
-                          <span className={`text-[9px] font-mono px-2 py-0.5 rounded uppercase font-bold ${
-                            f.severity === 'CRITICAL' ? 'badge-critical' : (f.severity === 'HIGH' ? 'badge-high' : 'badge-medium')
-                          }`}>
-                            {f.severity}
-                          </span>
-                        </div>
-                        <p className="text-xs text-red-400/90 bg-red-950/20 p-2 rounded border border-red-900/30">
-                          {f.explanation}
-                        </p>
-                        {f.remediation && (
-                          <div className="pt-1 text-[11px] text-slate-400 flex items-center justify-between">
-                            <span>Remediation: <strong className="text-slate-300">{f.remediation.objective}</strong></span>
-                            <button
-                              onClick={() => onNavigateTab && onNavigateTab('remediation')}
-                              className="text-cyan-400 hover:underline inline-flex items-center gap-1"
-                            >
-                              CLI Playbook <ChevronRight className="w-3 h-3" />
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
-
-              {/* Tab: Passed Controls */}
-              {activeConfigTab === 'passed' && (
-                <div className="space-y-2 max-h-[450px] overflow-y-auto pr-1">
-                  {passed.map((p) => (
-                    <div key={p.control_id} className="p-2.5 rounded-lg bg-slate-900/40 border border-slate-800/80 flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                        <span className="font-mono font-bold text-slate-300">{p.control_id}</span>
-                        <span className="text-slate-300 truncate max-w-md">{p.title}</span>
-                      </div>
-                      <span className="font-mono text-[10px] text-emerald-400 badge-pass px-2 py-0.5 rounded">PASSED</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Tab: Config History */}
-              {activeConfigTab === 'history' && (
-                <div className="space-y-3">
-                  {configs.map((c) => (
-                    <div key={c.id} className="p-3 rounded-lg bg-slate-900/60 border border-slate-800 text-xs space-y-1.5">
-                      <div className="flex items-center justify-between font-mono">
-                        <span className="font-bold text-cyan-400">{c.version_label}</span>
-                        <span className="text-slate-500">{new Date(c.created_at * 1000).toLocaleString()}</span>
-                      </div>
-                      <p className="text-slate-400 text-[11px]">Author: {c.author} — Reason: {c.change_reason}</p>
-                      <pre className="bg-slate-950 p-2.5 rounded text-[11px] font-mono text-slate-300 max-h-36 overflow-y-auto border border-slate-900">
-                        {c.raw_config}
-                      </pre>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="text-center py-20 text-slate-500 text-xs">
-              Select a device to inspect compliance posture
-            </div>
-          )}
+          <button className="btn btn-primary">
+            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>add</span>
+            Add Device
+          </button>
         </div>
       </div>
 
-      {/* Upload Configuration Modal */}
-      {showUploadModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <div className="glass-panel p-6 max-w-2xl w-full space-y-4 shadow-2xl border-cyan-500/40">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h3 className="font-heading font-bold text-base text-slate-100 flex items-center gap-2">
-                <Upload className="w-4 h-4 text-cyan-400" /> Upload Configuration for {selectedDevice?.name}
-              </h3>
-              <button onClick={() => setShowUploadModal(false)} className="text-slate-400 hover:text-slate-200">✕</button>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-xs font-mono text-slate-400 block mb-1">Version Label</label>
-                <input
-                  type="text"
-                  value={versionLabel}
-                  onChange={(e) => setVersionLabel(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-800 rounded px-3 py-1.5 text-xs text-slate-200"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-mono text-slate-400 block mb-1">Change Reason</label>
-                <input
-                  type="text"
-                  value={changeReason}
-                  onChange={(e) => setChangeReason(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-800 rounded px-3 py-1.5 text-xs text-slate-200"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="text-xs font-mono text-slate-400 block mb-1">Raw Configuration Text (CLI syntax)</label>
-              <textarea
-                rows={10}
-                placeholder="Paste Cisco, Juniper, Fortinet, or Palo Alto configuration here..."
-                value={uploadText}
-                onChange={(e) => setUploadText(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 font-mono text-xs text-slate-200 focus:outline-none focus:border-cyan-400"
-              />
-            </div>
-
-            <div className="flex items-center justify-end gap-3 pt-2">
-              <button 
-                onClick={() => setShowUploadModal(false)}
-                className="btn-cyber-secondary text-xs"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={handleUploadConfig}
-                disabled={uploading || !uploadText.trim()}
-                className="btn-cyber-primary text-xs"
-              >
-                {uploading ? 'Processing & Evaluating...' : 'Upload & Trigger Compliance Scan'}
-              </button>
-            </div>
+      {/* Stats */}
+      <div className="stat-cards">
+        <div className="stat-card">
+          <div className="stat-card-header">
+            <span className="stat-card-label">Total Devices</span>
+            <div className="stat-card-icon"><span className="material-symbols-outlined">dns</span></div>
           </div>
+          <div className="stat-card-value primary">{displayDevices.length}</div>
+          <div className="stat-card-sub">Multi-vendor managed fleet</div>
         </div>
-      )}
+        <div className="stat-card">
+          <div className="stat-card-header">
+            <span className="stat-card-label">Compliant</span>
+            <div className="stat-card-icon"><span className="material-symbols-outlined">check_circle</span></div>
+          </div>
+          <div className="stat-card-value success">{displayDevices.filter(d => d.status === 'COMPLIANT').length}</div>
+          <div className="stat-card-sub">Passing all frameworks</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-card-header">
+            <span className="stat-card-label">Non-Compliant</span>
+            <div className="stat-card-icon"><span className="material-symbols-outlined">error</span></div>
+          </div>
+          <div className="stat-card-value error">{displayDevices.filter(d => d.status !== 'COMPLIANT').length}</div>
+          <div className="stat-card-sub">Requiring remediation</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-card-header">
+            <span className="stat-card-label">Active Drift</span>
+            <div className="stat-card-icon"><span className="material-symbols-outlined">compare_arrows</span></div>
+          </div>
+          <div className="stat-card-value warning">{displayDevices.filter(d => d.status === 'DRIFT').length}</div>
+          <div className="stat-card-sub">Configuration drift detected</div>
+        </div>
+      </div>
+
+      {/* Device Table */}
+      <div className="data-table-container">
+        <div className="data-table-toolbar">
+          <div className="data-table-search">
+            <span className="material-symbols-outlined">search</span>
+            <input type="text" placeholder="Search by hostname, IP, vendor..." />
+          </div>
+          <div className="filter-chip">Vendor: All</div>
+          <div className="filter-chip">Status: All</div>
+        </div>
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Hostname</th>
+              <th>IP Address</th>
+              <th>Vendor & Platform</th>
+              <th>Location</th>
+              <th>Config Version</th>
+              <th>Score</th>
+              <th>Findings</th>
+              <th>Status</th>
+              <th>Ingested</th>
+            </tr>
+          </thead>
+          <tbody>
+            {displayDevices.map((dev, i) => (
+              <tr key={i} style={{ cursor: 'pointer' }} onClick={() => { setSelectedDevice(dev); onSelectDevice && onSelectDevice(dev.id); }}>
+                <td>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 18, color: 'var(--on-surface-variant)' }}>
+                      {dev.vendor === 'Fortinet' || dev.vendor === 'Palo Alto' ? 'security' : 'dns'}
+                    </span>
+                    <span style={{ fontWeight: 700 }}>{dev.hostname}</span>
+                  </div>
+                </td>
+                <td><span className="code-tag">{dev.ip}</span></td>
+                <td>
+                  <div style={{ fontWeight: 600, fontSize: '0.8125rem' }}>{dev.vendor}</div>
+                  <div style={{ fontSize: '0.6875rem', color: 'var(--on-surface-variant)' }}>{dev.platform}</div>
+                </td>
+                <td style={{ fontSize: '0.75rem', color: 'var(--on-surface-variant)' }}>{dev.location}</td>
+                <td><span className="code-tag" style={{ fontSize: '0.625rem' }}>{dev.configVersion}</span></td>
+                <td>
+                  <span style={{ fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", color: dev.complianceScore >= 85 ? 'var(--severity-pass)' : dev.complianceScore >= 70 ? 'var(--severity-medium)' : 'var(--severity-critical)' }}>
+                    {dev.complianceScore}%
+                  </span>
+                </td>
+                <td>
+                  <div style={{ display: 'flex', gap: '0.25rem' }}>
+                    {dev.findings.critical > 0 && <span className="badge critical">{dev.findings.critical}C</span>}
+                    {dev.findings.high > 0 && <span className="badge high">{dev.findings.high}H</span>}
+                    {dev.findings.medium > 0 && <span className="badge medium">{dev.findings.medium}M</span>}
+                  </div>
+                </td>
+                <td>
+                  <span className={`badge ${dev.status === 'COMPLIANT' ? 'pass' : dev.status === 'DRIFT' ? 'fail' : dev.status === 'WARNING' ? 'medium' : 'high'}`}>
+                    {dev.status}
+                  </span>
+                </td>
+                <td style={{ fontSize: '0.75rem', color: 'var(--on-surface-variant)' }}>{dev.lastIngestion}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div className="data-table-footer">
+          <span>Showing {displayDevices.length} devices</span>
+        </div>
+      </div>
     </div>
   );
 }
