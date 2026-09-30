@@ -1,189 +1,164 @@
 import React, { useState } from 'react';
-import { 
-  HelpCircle, Send, Bot, User, Sparkles, 
-  Terminal, ShieldCheck, ArrowRight, ShieldAlert, Cpu
-} from 'lucide-react';
 
 export default function AssistantView({ onNavigateTab }) {
   const [messages, setMessages] = useState([
     {
+      role: 'system',
+      content: 'Welcome to the Cipher-X Training Studio & Security Assistant. You can ask compliance questions, request device analysis, or explore security recommendations.',
+    },
+    {
       role: 'assistant',
-      text: "👋 Hello! I am the Cipher-X Grounded Security Assistant. I retrieve factual network configuration telemetry, compliance assessments, and audit logs to answer your cybersecurity queries without hallucinating.\n\nTry asking me one of the quick questions below:",
-      grounded_facts: null,
-      suggested_actions: [
-        "Which devices allow Telnet?",
-        "Which devices failed SSH?",
-        "Show critical findings",
-        "What happens if I disable Telnet?",
-        "How can I remediate CTRL-TELNET-01?"
-      ]
-    }
+      content: 'How can I help you today? You can ask me about:\n\n• **Compliance posture** for specific devices\n• **Security findings** and remediation guidance\n• **Framework mapping** between CIS, NIST, DISA STIG\n• **Configuration analysis** and drift detection\n• **Risk assessment** for configuration changes',
+      citations: [],
+    },
   ]);
-  const [inputQuery, setInputQuery] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const quickPrompts = [
-    "Which devices allow Telnet?",
-    "Which devices failed SSH?",
-    "Which devices have weak cryptography?",
-    "Show critical findings",
-    "What happens if I disable Telnet?",
-    "How can I remediate CTRL-SSH-01?"
-  ];
-
-  const handleSend = async (queryText = null) => {
-    const q = queryText || inputQuery;
-    if (!q.trim() || loading) return;
-
-    // Add user message
-    const newMessages = [...messages, { role: 'user', text: q }];
-    setMessages(newMessages);
-    setInputQuery('');
-    setLoading(true);
+  const handleSend = async () => {
+    if (!input.trim()) return;
+    const userMsg = { role: 'user', content: input };
+    setMessages(prev => [...prev, userMsg]);
+    setInput('');
+    setIsLoading(true);
 
     try {
-      const res = await fetch('/api/v1/assistant/query', {
+      const res = await fetch('/api/v1/assistant/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: q })
+        body: JSON.stringify({ query: input }),
       });
       if (res.ok) {
         const data = await res.json();
-        setMessages([
-          ...newMessages,
-          {
-            role: 'assistant',
-            text: data.answer,
-            grounded_facts: data.grounded_facts,
-            intent: data.intent,
-            suggested_actions: data.suggested_actions
-          }
-        ]);
+        setMessages(prev => [...prev, { role: 'assistant', content: data.response || 'No response available.', citations: data.citations || [] }]);
+      } else {
+        setMessages(prev => [...prev, { role: 'assistant', content: 'I apologize, but I was unable to process your request. Please try again.' }]);
       }
     } catch (e) {
-      console.error(e);
-      setMessages([
-        ...newMessages,
-        { role: 'assistant', text: "An error occurred communicating with the security intelligence engine." }
-      ]);
-    } finally {
-      setLoading(false);
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Connection error. The security assistant service may be offline.' }]);
     }
+    setIsLoading(false);
   };
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
-      {/* Header */}
-      <div>
-        <h2 className="font-heading font-extrabold text-2xl text-slate-100 flex items-center gap-2.5">
-          <Sparkles className="w-6 h-6 text-cyan-400" /> Grounded AI Security Assistant
-        </h2>
-        <p className="text-xs text-slate-400 mt-1">
-          Grounded cybersecurity intelligence with factual telemetry retrieval, prompt-injection defense, and verifiable evidence.
-        </p>
+    <div className="animate-in">
+      <div className="page-header">
+        <div className="page-header-badge">
+          <span className="material-symbols-outlined" style={{ fontSize: 14 }}>model_training</span>
+          AI SECURITY INTELLIGENCE
+        </div>
+        <h1>Training Studio & Security Assistant</h1>
+        <p>Grounded cybersecurity assistant trained on your compliance frameworks, device configurations, and security policies. All responses include provenance citations.</p>
       </div>
 
-      {/* Quick Prompt Chips */}
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs font-mono text-slate-500">Quick Inquiries:</span>
-        {quickPrompts.map((p, idx) => (
-          <button
-            key={idx}
-            onClick={() => handleSend(p)}
-            className="text-xs px-3 py-1 rounded-full bg-slate-900 border border-slate-700 hover:border-cyan-400 text-slate-300 hover:text-cyan-300 transition"
-          >
-            {p}
-          </button>
-        ))}
-      </div>
-
-      {/* Chat Messages Log */}
-      <div className="glass-panel p-5 min-h-[500px] max-h-[600px] flex flex-col justify-between space-y-4">
-        <div className="space-y-4 overflow-y-auto pr-2 flex-1">
-          {messages.map((m, idx) => (
-            <div
-              key={idx}
-              className={`flex items-start gap-3 text-xs leading-relaxed ${
-                m.role === 'user' ? 'justify-end' : 'justify-start'
-              }`}
-            >
-              {m.role === 'assistant' && (
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shrink-0 shadow-md">
-                  <Bot className="w-4 h-4 text-slate-950 stroke-[2.5]" />
-                </div>
-              )}
-
-              <div className={`p-4 rounded-xl max-w-2xl border space-y-2.5 ${
-                m.role === 'user'
-                  ? 'bg-cyan-500/15 border-cyan-500/40 text-cyan-100 rounded-tr-none'
-                  : 'bg-slate-900/90 border-slate-800 text-slate-200 rounded-tl-none shadow-lg'
-              }`}>
-                {/* Text Content */}
-                <div className="whitespace-pre-line font-sans text-xs">
-                  {m.text}
-                </div>
-
-                {/* Suggested Action Buttons */}
-                {m.suggested_actions?.length > 0 && (
-                  <div className="pt-2 border-t border-slate-800/80 flex flex-wrap items-center gap-2">
-                    {m.suggested_actions.map((act, aIdx) => (
-                      <button
-                        key={aIdx}
-                        onClick={() => handleSend(act)}
-                        className="text-[11px] font-mono px-2.5 py-1 rounded bg-slate-950 border border-slate-800 text-cyan-300 hover:border-cyan-400 transition"
-                      >
-                        {act}
-                      </button>
+      {/* Chat Container */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '1rem' }}>
+        {/* Chat Messages */}
+        <div className="info-card" style={{ minHeight: 500, display: 'flex', flexDirection: 'column' }}>
+          <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1rem' }}>
+            {messages.map((msg, i) => (
+              <div key={i} style={{
+                alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                maxWidth: '80%',
+                padding: '0.75rem 1rem',
+                borderRadius: 'var(--radius-lg)',
+                background: msg.role === 'user' ? 'var(--primary-container)' : msg.role === 'system' ? 'var(--surface-container)' : 'var(--surface-container-low)',
+                color: msg.role === 'user' ? '#fff' : 'var(--on-surface)',
+                fontSize: '0.8125rem',
+                lineHeight: 1.6,
+                border: msg.role === 'system' ? '1px solid var(--outline-variant)' : 'none',
+              }}>
+                {msg.role === 'system' && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', marginBottom: '0.375rem', fontSize: '0.6875rem', fontWeight: 600, color: 'var(--on-surface-variant)' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 14 }}>info</span>
+                    SYSTEM
+                  </div>
+                )}
+                {msg.role === 'assistant' && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', marginBottom: '0.375rem', fontSize: '0.6875rem', fontWeight: 600, color: 'var(--primary)' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: 14 }}>smart_toy</span>
+                    CIPHER-X ASSISTANT
+                  </div>
+                )}
+                <div style={{ whiteSpace: 'pre-wrap' }}>{msg.content}</div>
+                {msg.citations && msg.citations.length > 0 && (
+                  <div style={{ marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: `1px solid ${msg.role === 'user' ? 'rgba(255,255,255,0.2)' : 'var(--surface-variant)'}`, fontSize: '0.6875rem' }}>
+                    <span style={{ fontWeight: 600 }}>Citations:</span>
+                    {msg.citations.map((c, ci) => (
+                      <span key={ci} className="code-tag" style={{ fontSize: '0.5625rem', marginLeft: '0.375rem' }}>{c}</span>
                     ))}
                   </div>
                 )}
               </div>
-
-              {m.role === 'user' && (
-                <div className="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0">
-                  <User className="w-4 h-4 text-slate-300" />
-                </div>
-              )}
-            </div>
-          ))}
-
-          {loading && (
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center animate-pulse">
-                <Bot className="w-4 h-4 text-cyan-400" />
+            ))}
+            {isLoading && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', color: 'var(--on-surface-variant)', padding: '0.5rem' }}>
+                <div className="loading-spinner" style={{ width: 16, height: 16, borderWidth: 2 }}></div>
+                Analyzing your query...
               </div>
-              <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs font-mono text-cyan-400 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
-                Retrieving grounded facts from database & compliance AST engine...
-              </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
 
-        {/* Input Bar */}
-        <div className="pt-3 border-t border-slate-800/80">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSend();
-            }}
-            className="flex items-center gap-2"
-          >
+          {/* Input */}
+          <div style={{ display: 'flex', gap: '0.5rem', borderTop: '1px solid var(--surface-variant)', paddingTop: '0.75rem' }}>
             <input
               type="text"
-              placeholder="Ask a factual question (e.g. 'Which devices allow Telnet?' or 'What happens if I disable Telnet?')..."
-              value={inputQuery}
-              onChange={(e) => setInputQuery(e.target.value)}
-              className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400 font-sans"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+              placeholder="Ask about compliance, security findings, or configuration analysis..."
+              style={{ flex: 1, padding: '0.5rem 0.75rem', border: '1px solid var(--outline-variant)', borderRadius: 'var(--radius-md)', background: 'var(--surface-container-low)', fontFamily: 'inherit', fontSize: '0.8125rem' }}
             />
-            <button
-              type="submit"
-              disabled={loading || !inputQuery.trim()}
-              className="btn-cyber-primary py-2.5 px-4 text-xs"
-            >
-              <Send className="w-4 h-4" />
+            <button className="btn btn-primary" onClick={handleSend}>
+              <span className="material-symbols-outlined" style={{ fontSize: 16 }}>send</span>
+              Send
             </button>
-          </form>
+          </div>
+        </div>
+
+        {/* Quick Actions Sidebar */}
+        <div>
+          <div className="info-card">
+            <h4 style={{ marginBottom: '0.75rem' }}>Quick Queries</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+              {[
+                'Show critical findings for Cisco-Core-01',
+                'What is the compliance score for NIST 800-53?',
+                'List devices with Telnet enabled',
+                'Explain CIS-NET-004 control',
+                'Generate remediation for weak SSH ciphers',
+                'Compare baseline vs running config',
+              ].map((query, i) => (
+                <button
+                  key={i}
+                  onClick={() => { setInput(query); }}
+                  style={{ textAlign: 'left', padding: '0.5rem 0.625rem', border: '1px solid var(--outline-variant)', borderRadius: 'var(--radius-md)', background: 'var(--surface-container-lowest)', cursor: 'pointer', fontSize: '0.75rem', fontFamily: 'inherit', transition: 'all 0.15s' }}
+                  onMouseOver={(e) => { e.target.style.borderColor = 'var(--primary)'; e.target.style.color = 'var(--primary)'; }}
+                  onMouseOut={(e) => { e.target.style.borderColor = 'var(--outline-variant)'; e.target.style.color = 'var(--on-surface)'; }}
+                >
+                  {query}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="info-card" style={{ marginTop: '0.75rem' }}>
+            <h4 style={{ marginBottom: '0.5rem' }}>Grounding Sources</h4>
+            <div style={{ fontSize: '0.75rem', color: 'var(--on-surface-variant)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', marginBottom: '0.375rem' }}>
+                <span className="status-dot green"></span> 5 Compliance Frameworks
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', marginBottom: '0.375rem' }}>
+                <span className="status-dot green"></span> 274 Security Controls
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', marginBottom: '0.375rem' }}>
+                <span className="status-dot green"></span> 128 Device Configs
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                <span className="status-dot green"></span> 482 Semantic Mappings
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
