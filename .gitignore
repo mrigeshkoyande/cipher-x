@@ -6,18 +6,43 @@ __pycache__/
 .venv/
 env/
 venv/
+*.egg-info/
 
-# Database & runtime files
+# Databases & Runtime Storage
 *.db
+*.sqlite
 *.sqlite3
+backend/cipherx.db
+cipherx.db
+storage/
+!storage/.gitkeep
+backend/storage/
+!backend/storage/.gitkeep
+
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Design & raw source video dumps
+design/
+*.png
+*.jpg
+*.jpeg
+/*.mp4
+!/frontend/public/*.mp4
 
 # Node / Frontend
 node_modules/
 dist/
 .tmp/
+.eslintcache
 
 # OS / IDE
 .DS_Store
 Thumbs.db
 .idea/
 .vscode/
+*.swp

@@ -46,27 +46,24 @@ export function LandingPage() {
           loop
           muted
           playsInline
-          src="/landing-bg.mp4"
+          src="/background.mp4"
           style={{
             position: 'absolute',
-            top: '50%',
-            left: '50%',
-            minWidth: '100%',
-            minHeight: '100%',
-            width: 'auto',
-            height: 'auto',
-            transform: 'translate(-50%, -50%)',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
             objectFit: 'cover',
-            opacity: 0.35,
-            filter: 'contrast(1.15) brightness(0.85)',
+            opacity: 0.5,
+            filter: 'contrast(1.1) brightness(0.95)',
           }}
         />
-        {/* Subtle dark gradient overlay to ensure text readability across the entire page */}
+        {/* Subtle dark gradient overlay to ensure crisp contrast and text readability */}
         <div
           style={{
             position: 'absolute',
             inset: 0,
-            background: 'radial-gradient(ellipse 90% 70% at 50% 30%, rgba(5, 9, 20, 0.65) 0%, rgba(5, 9, 20, 0.88) 100%)',
+            background: 'radial-gradient(ellipse 90% 70% at 50% 30%, rgba(5, 9, 20, 0.25) 0%, rgba(5, 9, 20, 0.55) 100%)',
           }}
         />
       </div>

@@ -62,11 +62,23 @@ def get_current_user(
             role: str = payload.get("role", "SECURITY_ANALYST")
             tenant_id: str = x_tenant_id or payload.get("tenant_id", "tenant_default")
             if user_id is None:
-                raise HTTPException(status_code=401, detail="Invalid authentication token")
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid authentication token payload")
             return CurrentUser(user_id=user_id, username=user_id, email=f"{user_id}@cipherx.sec", role=role, tenant_id=tenant_id)
         except jwt.PyJWTError:
-            pass
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Could not validate credentials or token expired",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
 
+    if settings.REQUIRE_AUTH:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication token missing",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # Dev fallback mode only when REQUIRE_AUTH=False explicitly
     effective_tenant = x_tenant_id or "tenant_default"
     return CurrentUser(
         user_id="usr_admin",

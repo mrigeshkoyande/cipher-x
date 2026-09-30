@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: cipherx-backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - PROJECT_NAME=CIPHER-X
+      - VERSION=1.0.0
+      - ENVIRONMENT=production
+      - REQUIRE_AUTH=true
+      - SECRET_KEY=${SECRET_KEY:-cipherx-production-secret-key-must-be-changed-in-env-file}
+      - DATABASE_URL=${DATABASE_URL:-sqlite:///./cipherx.db}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost,http://localhost:5173,http://127.0.0.1}
+      - AI_PROVIDER=${AI_PROVIDER:-mock}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    volumes:
+      - cipherx_storage:/app/backend/storage
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: cipherx-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  cipherx_storage:
