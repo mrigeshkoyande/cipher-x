@@ -1,0 +1,369 @@
+{
+  "vendor": "palo_alto",
+  "display_name": "Palo Alto Networks (PAN-OS)",
+  "platforms": ["pan-os", "vm-series", "pa-series"],
+  "detection_patterns": [
+    "set\\s+deviceconfig\\s+system",
+    "<config\\s+version=",
+    "set\\s+mgt-config\\s+users",
+    "set\\s+rulebase\\s+security"
+  ],
+  "parameter_extractors": {
+    "ssh.version": {
+      "patterns": [
+        "set\\s+deviceconfig\\s+system\\s+ssh\\s+ciphers"
+      ],
+      "default": 2
+    },
+    "ssh.enabled": {
+      "patterns": [
+        "set\\s+deviceconfig\\s+system\\s+service\\s+disable-ssh\\s+no",
+        "set\\s+network\\s+profiles\\s+interface-management-profile\\s+\\S+\\s+ssh\\s+yes"
+      ],
+      "default": true
+    },
+    "telnet.enabled": {
+      "patterns": [
+        "set\\s+network\\s+profiles\\s+interface-management-profile\\s+\\S+\\s+telnet\\s+yes",
+        "set\\s+deviceconfig\\s+system\\s+service\\s+disable-telnet\\s+no"
+      ],
+      "default": false
+    },
+    "http.server_enabled": {
+      "patterns": [
+        "set\\s+network\\s+profiles\\s+interface-management-profile\\s+\\S+\\s+http\\s+yes",
+        "set\\s+deviceconfig\\s+system\\s+service\\s+disable-http\\s+no"
+      ],
+      "default": false
+    },
+    "https.server_enabled": {
+      "patterns": [
+        "set\\s+network\\s+profiles\\s+interface-management-profile\\s+\\S+\\s+https\\s+yes",
+        "set\\s+deviceconfig\\s+system\\s+service\\s+disable-https\\s+no"
+      ],
+      "default": true
+    },
+    "snmp.version": {
+      "patterns": [
+        "set\\s+deviceconfig\\s+system\\s+snmp-setting\\s+version\\s+v3",
+        "set\\s+shared\\s+log-settings\\s+snmptrap\\s+\\S+\\s+version\\s+v3"
+      ],
+      "default": "v2c"
+    },
+    "snmp.has_default_community": {
+      "patterns": [
+        "set\\s+deviceconfig\\s+system\\s+snmp-setting\\s+version\\s+v2c\\s+snmp-community-string\\s+(public|private)"
+      ],
+      "default": false
+    },
+    "logging.remote_server_configured": {
+      "patterns": [
+        "set\\s+shared\\s+log-settings\\s+syslog\\s+\\S+\\s+server\\s+\\S+",
+        "set\\s+deviceconfig\\s+system\\s+syslog\\s+server"
+      ],
+      "default": false
+    },
+    "logging.timestamp_precision": {
+      "patterns": [
+        "set\\s+shared\\s+log-settings\\s+syslog\\s+\\S+\\s+format\\s+(BSD|IETF)"
+      ],
+      "default": "IETF"
+    },
+    "ntp.configured": {
+      "patterns": [
+        "set\\s+deviceconfig\\s+system\\s+ntp-servers\\s+primary-ntp-server\\s+ntp-server-address\\s+\\S+"
+      ],
+      "default": false
+    },
+    "aaa.centralized_enabled": {
+      "patterns": [
+        "set\\s+shared\\s+authentication-profile\\s+\\S+\\s+method\\s+(tacplus|radius|saml)",
+        "set\\s+shared\\s+server-profile\\s+tacplus"
+      ],
+      "default": false
+    },
+    "password.min_length": {
+      "patterns": [
+        "set\\s+mgt-config\\s+password-complexity\\s+minimum-length\\s+(?P<val>\\d+)"
+      ],
+      "default": 8
+    },
+    "password.strong_hashing_enabled": {
+      "patterns": [
+        "set\\s+mgt-config\\s+password-complexity\\s+enabled\\s+yes"
+      ],
+      "default": true
+    },
+    "session.inactivity_timeout_minutes": {
+      "patterns": [
+        "set\\s+deviceconfig\\s+setting\\s+management\\s+idle-timeout\\s+(?P<val>\\d+)"
+      ],
+      "default": 30
+    },
+    "crypto.weak_ciphers_prohibited": {
+      "patterns": [
+        "set\\s+deviceconfig\\s+system\\s+ssh\\s+ciphers\\s+aes256-gcm"
+      ],
+      "default": true
+    },
+    "services.unused_services_disabled": {
+      "patterns": [
+        "set\\s+deviceconfig\\s+system\\s+service\\s+disable-telnet\\s+yes",
+        "set\\s+deviceconfig\\s+system\\s+service\\s+disable-http\\s+yes"
+      ],
+      "default": true
+    },
+    "mgmt.plane_isolated": {
+      "patterns": [
+        "set\\s+deviceconfig\\s+system\\s+ip-address",
+        "set\\s+network\\s+profiles\\s+interface-management-profile"
+      ],
+      "default": true
+    },
+    "acl.configured_with_default_deny": {
+      "patterns": [
+        "set\\s+rulebase\\s+default-security-rules\\s+rules\\s+interzone-default\\s+action\\s+(deny|drop)"
+      ],
+      "default": true
+    },
+    "firewall.stateful_inspection_enabled": {
+      "patterns": [
+        "set\\s+rulebase\\s+security\\s+rules"
+      ],
+      "default": true
+    },
+    "vpn.remote_access_mfa_enabled": {
+      "patterns": [
+        "set\\s+shared\\s+authentication-profile\\s+\\S+\\s+multi-factor-auth",
+        "set\\s+network\\s+global-protect"
+      ],
+      "default": false
+    },
+    "auth.brute_force_lockout_enabled": {
+      "patterns": [
+        "set\\s+deviceconfig\\s+setting\\s+management\\s+failed-attempts\\s+[1-5]"
+      ],
+      "default": false
+    },
+    "authz.command_authorization_enabled": {
+      "patterns": [
+        "set\\s+mgt-config\\s+users\\s+\\S+\\s+permissions\\s+role-based"
+      ],
+      "default": false
+    },
+    "routing.neighbor_auth_enabled": {
+      "patterns": [
+        "set\\s+network\\s+virtual-router\\s+default\\s+protocol\\s+bgp\\s+peer-group\\s+\\S+\\s+peer\\s+\\S+\\s+authentication-key"
+      ],
+      "default": false
+    },
+    "interface.l2_security_enabled": {
+      "patterns": [
+        "set\\s+network\\s+interface\\s+ethernet\\s+\\S+\\s+layer2"
+      ],
+      "default": true
+    }
+  },
+  "remediations": {
+    "REM-SSH-01": {
+      "objective": "Enforce SSHv2 and high-assurance ciphers in PAN-OS",
+      "cli_command": "set deviceconfig system ssh ciphers [ aes256-gcm aes128-gcm aes256-ctr ]\nset deviceconfig system ssh macs [ hmac-sha2-512 hmac-sha2-256 ]\nset deviceconfig system ssh kex [ ecdh-sha2-nistp384 ecdh-sha2-nistp256 ]\ncommit",
+      "before_example": "! default SSH cipher profile",
+      "after_example": "set deviceconfig system ssh ciphers [ aes256-gcm ... ]",
+      "verification_command": "show system ssh-config",
+      "rollback_command": "delete deviceconfig system ssh ciphers\ncommit",
+      "impact_level": "LOW",
+      "explanation": "Hardens management plane SSH daemon with modern Elliptic Curve and GCM cipher suites."
+    },
+    "REM-TELNET-01": {
+      "objective": "Explicitly disable Telnet daemon in PAN-OS",
+      "cli_command": "set deviceconfig system service disable-telnet yes\ncommit",
+      "before_example": "set deviceconfig system service disable-telnet no",
+      "after_example": "set deviceconfig system service disable-telnet yes",
+      "verification_command": "show system state | match telnet",
+      "rollback_command": "set deviceconfig system service disable-telnet no\ncommit",
+      "impact_level": "LOW",
+      "explanation": "Deactivates telnet daemon on Palo Alto firewall."
+    },
+    "REM-HTTP-01": {
+      "objective": "Explicitly disable unencrypted HTTP management daemon in PAN-OS",
+      "cli_command": "set deviceconfig system service disable-http yes\ncommit",
+      "before_example": "set deviceconfig system service disable-http no",
+      "after_example": "set deviceconfig system service disable-http yes",
+      "verification_command": "show system state | match http",
+      "rollback_command": "set deviceconfig system service disable-http no\ncommit",
+      "impact_level": "LOW",
+      "explanation": "Disables cleartext port 80 web administration listener."
+    },
+    "REM-HTTPS-01": {
+      "objective": "Enforce TLS 1.2+ minimum protocol for PAN-OS management Web GUI",
+      "cli_command": "set shared ssl-tls-service-profile SEC-ADMIN-TLS min-version tls1-2 max-version tls1-3\nset deviceconfig system ssl-tls-service-profile SEC-ADMIN-TLS\ncommit",
+      "before_example": "! default TLS profile allows TLS 1.0",
+      "after_example": "set shared ssl-tls-service-profile SEC-ADMIN-TLS min-version tls1-2 ...",
+      "verification_command": "show shared ssl-tls-service-profile SEC-ADMIN-TLS",
+      "rollback_command": "delete deviceconfig system ssl-tls-service-profile\ncommit",
+      "impact_level": "LOW",
+      "explanation": "Applies strict TLS 1.2+ SSL profile to administrative web portal."
+    },
+    "REM-SNMP-01": {
+      "objective": "Configure SNMPv3 with authPriv and disable SNMPv2c strings in PAN-OS",
+      "cli_command": "set deviceconfig system snmp-setting version v3 snmp-user secadmin authpwd \"AuthPass2026!\" privpwd \"PrivPass2026!\" authproto sha256 privproto aes-256\ndelete deviceconfig system snmp-setting version v2c\ncommit",
+      "before_example": "set deviceconfig system snmp-setting version v2c snmp-community-string public",
+      "after_example": "set deviceconfig system snmp-setting version v3 snmp-user secadmin ...",
+      "verification_command": "show deviceconfig system snmp-setting",
+      "rollback_command": "delete deviceconfig system snmp-setting version v3\ncommit",
+      "impact_level": "MEDIUM",
+      "explanation": "Replaces insecure v2c community strings with SNMPv3 USM authPriv profile."
+    },
+    "REM-LOG-01": {
+      "objective": "Configure remote Syslog server profile in PAN-OS",
+      "cli_command": "set shared log-settings syslog SIEM-FORWARDER server 10.100.20.50 server 10.100.20.50 transport UDP port 514 format IETF facility LOG_LOCAL7\nset shared log-settings system-log-profile match-list ALL-LOGS send-syslog SIEM-FORWARDER\ncommit",
+      "before_example": "! no syslog server profile configured",
+      "after_example": "set shared log-settings syslog SIEM-FORWARDER server 10.100.20.50 ...",
+      "verification_command": "show shared log-settings syslog SIEM-FORWARDER",
+      "rollback_command": "delete shared log-settings syslog SIEM-FORWARDER\ncommit",
+      "impact_level": "NONE",
+      "explanation": "Forwards all system, security, config, and threat logs to centralized SIEM."
+    },
+    "REM-NTP-01": {
+      "objective": "Configure primary and secondary NTP time servers in PAN-OS",
+      "cli_command": "set deviceconfig system ntp-servers primary-ntp-server ntp-server-address 10.100.10.10\nset deviceconfig system ntp-servers secondary-ntp-server ntp-server-address 10.100.10.11\ncommit",
+      "before_example": "! no ntp servers defined",
+      "after_example": "set deviceconfig system ntp-servers primary-ntp-server ntp-server-address 10.100.10.10",
+      "verification_command": "show ntp",
+      "rollback_command": "delete deviceconfig system ntp-servers\ncommit",
+      "impact_level": "NONE",
+      "explanation": "Enables synchronized hardware and system time."
+    },
+    "REM-AAA-01": {
+      "objective": "Configure TACACS+ server profile and authentication profile in PAN-OS",
+      "cli_command": "set shared server-profile tacplus TACACS-CLUSTER server TACACS-01 ip-address 10.100.30.15 secret \"C1ph3rX!S3cur3K3y\" port 49\nset shared authentication-profile TACACS-AUTH-PROF method tacplus server-profile TACACS-CLUSTER\nset deviceconfig system authentication-profile TACACS-AUTH-PROF\ncommit",
+      "before_example": "set deviceconfig system authentication-profile local",
+      "after_example": "set deviceconfig system authentication-profile TACACS-AUTH-PROF",
+      "verification_command": "show shared authentication-profile TACACS-AUTH-PROF",
+      "rollback_command": "delete deviceconfig system authentication-profile\ncommit",
+      "impact_level": "HIGH",
+      "explanation": "Enforces centralized TACACS+ authentication for all administrator logins."
+    },
+    "REM-PASS-01": {
+      "objective": "Enforce 15-character minimum password complexity profile in PAN-OS",
+      "cli_command": "set mgt-config password-complexity enabled yes minimum-length 15 min-uppercase-letters 1 min-lowercase-letters 1 min-numeric-letters 1 min-special-characters 1 password-change-period 90\ncommit",
+      "before_example": "set mgt-config password-complexity enabled no",
+      "after_example": "set mgt-config password-complexity enabled yes minimum-length 15 ...",
+      "verification_command": "show mgt-config password-complexity",
+      "rollback_command": "set mgt-config password-complexity enabled no\ncommit",
+      "impact_level": "LOW",
+      "explanation": "Enforces enterprise password strength on local administrator accounts."
+    },
+    "REM-TIMEOUT-01": {
+      "objective": "Set 10-minute administrative idle timeout in PAN-OS",
+      "cli_command": "set deviceconfig setting management idle-timeout 10\ncommit",
+      "before_example": "set deviceconfig setting management idle-timeout 30",
+      "after_example": "set deviceconfig setting management idle-timeout 10",
+      "verification_command": "show deviceconfig setting management",
+      "rollback_command": "set deviceconfig setting management idle-timeout 30\ncommit",
+      "impact_level": "NONE",
+      "explanation": "Disconnects idle administrator sessions after 10 minutes."
+    },
+    "REM-CRYPTO-01": {
+      "objective": "Enforce AES-GCM ciphers across PAN-OS management and IPsec profiles",
+      "cli_command": "set network ike crypto-profiles ike-crypto-profiles IKE-STRONG-PROP hash sha384 dh-group [ group19 group20 ] encryption aes-256-cbc aes-256-gcm\ncommit",
+      "before_example": "! weak 3des ike crypto profile",
+      "after_example": "set network ike crypto-profiles ike-crypto-profiles IKE-STRONG-PROP ...",
+      "verification_command": "show network ike crypto-profiles",
+      "rollback_command": "! revert crypto profile",
+      "impact_level": "LOW",
+      "explanation": "Prohibits DES, 3DES, and MD5 across cryptographic VPN profiles."
+    },
+    "REM-UNUSED-01": {
+      "objective": "Disable unused management services in PAN-OS",
+      "cli_command": "set deviceconfig system service disable-telnet yes\nset deviceconfig system service disable-http yes\ncommit",
+      "before_example": "set deviceconfig system service disable-telnet no",
+      "after_example": "set deviceconfig system service disable-telnet yes",
+      "verification_command": "show system services",
+      "rollback_command": "! revert services",
+      "impact_level": "NONE",
+      "explanation": "Deactivates cleartext listeners."
+    },
+    "REM-MGMT-01": {
+      "objective": "Restrict management interface access profile in PAN-OS",
+      "cli_command": "set network profiles interface-management-profile SEC-MGMT-PROF https yes ssh yes ping no telnet no http no snmp no permitted-ip [ 10.100.0.0/16 ]\ncommit",
+      "before_example": "set network profiles interface-management-profile DEFAULT-MGMT http yes https yes telnet yes ssh yes",
+      "after_example": "set network profiles interface-management-profile SEC-MGMT-PROF https yes ssh yes permitted-ip [ 10.100.0.0/16 ]",
+      "verification_command": "show network profiles interface-management-profile SEC-MGMT-PROF",
+      "rollback_command": "! revert profile",
+      "impact_level": "HIGH",
+      "explanation": "Restricts management interface access to authorized CIDR blocks with encrypted protocols only."
+    },
+    "REM-ACL-01": {
+      "objective": "Enforce explicit default deny and logging on interzone security rules in PAN-OS",
+      "cli_command": "set rulebase default-security-rules rules interzone-default action drop log-end yes\ncommit",
+      "before_example": "set rulebase default-security-rules rules interzone-default action drop log-end no",
+      "after_example": "set rulebase default-security-rules rules interzone-default action drop log-end yes",
+      "verification_command": "show rulebase default-security-rules rules interzone-default",
+      "rollback_command": "set rulebase default-security-rules rules interzone-default log-end no\ncommit",
+      "impact_level": "MEDIUM",
+      "explanation": "Enforces logging on default interzone drop rule."
+    },
+    "REM-FW-01": {
+      "objective": "Enforce App-ID and security profiles on PAN-OS security policy rules",
+      "cli_command": "set rulebase security rules TRUST-TO-UNTRUST profile-setting group \"Strict-Security-Group\"\nset rulebase security rules TRUST-TO-UNTRUST log-start no log-end yes\ncommit",
+      "before_example": "set rulebase security rules TRUST-TO-UNTRUST profile-setting none",
+      "after_example": "set rulebase security rules TRUST-TO-UNTRUST profile-setting group \"Strict-Security-Group\"",
+      "verification_command": "show rulebase security rules TRUST-TO-UNTRUST",
+      "rollback_command": "delete rulebase security rules TRUST-TO-UNTRUST profile-setting\ncommit",
+      "impact_level": "HIGH",
+      "explanation": "Attaches Antivirus, Vulnerability Protection, Anti-Spyware, and URL Filtering."
+    },
+    "REM-REMOTE-01": {
+      "objective": "Enforce MFA on GlobalProtect portal and gateways in PAN-OS",
+      "cli_command": "set shared authentication-profile GP-MFA-PROF method saml server-profile OKTA-SAML-SRV\nset network global-protect gateway GP-GATEWAY authentication-profile GP-MFA-PROF\ncommit",
+      "before_example": "set network global-protect gateway GP-GATEWAY authentication-profile LOCAL-PW",
+      "after_example": "set network global-protect gateway GP-GATEWAY authentication-profile GP-MFA-PROF",
+      "verification_command": "show network global-protect gateway GP-GATEWAY",
+      "rollback_command": "set network global-protect gateway GP-GATEWAY authentication-profile LOCAL-PW\ncommit",
+      "impact_level": "MEDIUM",
+      "explanation": "Mandates SAML 2.0 / MFA on remote access GlobalProtect gateway."
+    },
+    "REM-AUTH-01": {
+      "objective": "Configure failed attempt administrator lockout in PAN-OS",
+      "cli_command": "set deviceconfig setting management failed-attempts 3\nset deviceconfig setting management lockout-time 5\ncommit",
+      "before_example": "set deviceconfig setting management failed-attempts 0",
+      "after_example": "set deviceconfig setting management failed-attempts 3\nset deviceconfig setting management lockout-time 5",
+      "verification_command": "show deviceconfig setting management",
+      "rollback_command": "set deviceconfig setting management failed-attempts 0\ncommit",
+      "impact_level": "LOW",
+      "explanation": "Locks administrative accounts after 3 failed login attempts for 5 minutes."
+    },
+    "REM-AUTHZ-01": {
+      "objective": "Configure role-based admin profiles in PAN-OS",
+      "cli_command": "set mgt-config users sec_auditor permissions role-based custom auditor-role\ncommit",
+      "before_example": "set mgt-config users sec_auditor permissions role-based superuser",
+      "after_example": "set mgt-config users sec_auditor permissions role-based custom auditor-role",
+      "verification_command": "show mgt-config users sec_auditor",
+      "rollback_command": "! revert permissions",
+      "impact_level": "HIGH",
+      "explanation": "Assigns read-only audit role instead of superuser."
+    },
+    "REM-ROUTING-01": {
+      "objective": "Configure BGP peer MD5 authentication in PAN-OS Virtual Router",
+      "cli_command": "set network virtual-router default protocol bgp peer-group WAN-PEERS peer PEER-01 authentication-key \"-AQ==BGP_P@ss2026!\"\ncommit",
+      "before_example": "! no authentication-key in bgp peer",
+      "after_example": "set network virtual-router default protocol bgp peer-group WAN-PEERS peer PEER-01 authentication-key ...",
+      "verification_command": "show network virtual-router default protocol bgp summary",
+      "rollback_command": "delete network virtual-router default protocol bgp peer-group WAN-PEERS peer PEER-01 authentication-key\ncommit",
+      "impact_level": "MEDIUM",
+      "explanation": "Secures virtual router BGP peering with encrypted authentication key."
+    },
+    "REM-IFSEC-01": {
+      "objective": "Configure Layer 2 interface zone binding and security profiles in PAN-OS",
+      "cli_command": "set network interface ethernet ethernet1/1 layer2\ncommit",
+      "before_example": "! default interface config",
+      "after_example": "set network interface ethernet ethernet1/1 layer2",
+      "verification_command": "show interface ethernet1/1",
+      "rollback_command": "! revert interface",
+      "impact_level": "LOW",
+      "explanation": "Binds Layer 2 interfaces to appropriate security zones."
+    }
+  }
+}

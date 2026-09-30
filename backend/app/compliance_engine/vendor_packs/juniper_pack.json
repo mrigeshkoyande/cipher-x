@@ -1,0 +1,377 @@
+{
+  "vendor": "juniper",
+  "display_name": "Juniper Networks (Junos OS)",
+  "platforms": ["junos", "srx", "mx", "qfx", "ex"],
+  "detection_patterns": [
+    "^##\\s*Last\\s*changed",
+    "set\\s+system\\s+host-name",
+    "version\\s+\\d+\\.\\d+R",
+    "system\\s*\\{\\s*host-name"
+  ],
+  "parameter_extractors": {
+    "ssh.version": {
+      "patterns": [
+        "set\\s+system\\s+services\\s+ssh\\s+protocol-version\\s+v(?P<val>\\d+)",
+        "protocol-version\\s+v(?P<val>\\d+);"
+      ],
+      "default": 2
+    },
+    "ssh.enabled": {
+      "patterns": [
+        "set\\s+system\\s+services\\s+ssh",
+        "system\\s*\\{[^}]*services\\s*\\{[^}]*ssh"
+      ],
+      "default": false
+    },
+    "telnet.enabled": {
+      "patterns": [
+        "set\\s+system\\s+services\\s+telnet",
+        "system\\s*\\{[^}]*services\\s*\\{[^}]*telnet"
+      ],
+      "default": false
+    },
+    "http.server_enabled": {
+      "patterns": [
+        "set\\s+system\\s+services\\s+web-management\\s+http",
+        "web-management\\s*\\{[^}]*http\\s*\\{"
+      ],
+      "default": false
+    },
+    "https.server_enabled": {
+      "patterns": [
+        "set\\s+system\\s+services\\s+web-management\\s+https",
+        "web-management\\s*\\{[^}]*https"
+      ],
+      "default": false
+    },
+    "snmp.version": {
+      "patterns": [
+        "set\\s+snmp\\s+v3",
+        "snmp\\s*\\{[^}]*v3"
+      ],
+      "default": "v2c"
+    },
+    "snmp.has_default_community": {
+      "patterns": [
+        "set\\s+snmp\\s+community\\s+(public|private)",
+        "community\\s+(public|private)\\s*\\{"
+      ],
+      "default": false
+    },
+    "logging.remote_server_configured": {
+      "patterns": [
+        "set\\s+system\\s+syslog\\s+host\\s+\\S+",
+        "syslog\\s*\\{[^}]*host\\s+\\S+"
+      ],
+      "default": false
+    },
+    "logging.timestamp_precision": {
+      "patterns": [
+        "set\\s+system\\s+syslog\\s+time-format\\s+(?P<val>millisecond|rfc5424)"
+      ],
+      "default": "millisecond"
+    },
+    "ntp.configured": {
+      "patterns": [
+        "set\\s+system\\s+ntp\\s+server\\s+\\S+",
+        "ntp\\s*\\{[^}]*server\\s+\\S+"
+      ],
+      "default": false
+    },
+    "aaa.centralized_enabled": {
+      "patterns": [
+        "set\\s+system\\s+authentication-order\\s+.*(tacplus|radius)",
+        "set\\s+system\\s+tacplus-server"
+      ],
+      "default": false
+    },
+    "password.min_length": {
+      "patterns": [
+        "set\\s+system\\s+login\\s+password\\s+minimum-length\\s+(?P<val>\\d+)"
+      ],
+      "default": 6
+    },
+    "password.strong_hashing_enabled": {
+      "patterns": [
+        "set\\s+system\\s+login\\s+password\\s+format\\s+sha-512"
+      ],
+      "default": false
+    },
+    "session.inactivity_timeout_minutes": {
+      "patterns": [
+        "set\\s+system\\s+login\\s+idle-timeout\\s+(?P<val>\\d+)"
+      ],
+      "default": 30
+    },
+    "crypto.weak_ciphers_prohibited": {
+      "negative_patterns": [
+        "set\\s+system\\s+services\\s+ssh\\s+ciphers.*(3des-cbc|blowfish|arcfour)"
+      ],
+      "default": true
+    },
+    "services.unused_services_disabled": {
+      "patterns": [
+        "set\\s+system\\s+services\\s+finger",
+        "set\\s+system\\s+services\\s+ftp"
+      ],
+      "is_inverse": true,
+      "default": true
+    },
+    "mgmt.plane_isolated": {
+      "patterns": [
+        "set\\s+routing-instances\\s+mgmt_junos",
+        "set\\s+routing-instances\\s+MGMT"
+      ],
+      "default": false
+    },
+    "acl.configured_with_default_deny": {
+      "patterns": [
+        "set\\s+firewall\\s+filter\\s+\\S+\\s+term\\s+default-deny\\s+then\\s+(reject|discard)",
+        "then\\s+(discard|reject);"
+      ],
+      "default": false
+    },
+    "firewall.stateful_inspection_enabled": {
+      "patterns": [
+        "set\\s+security\\s+policies\\s+from-zone",
+        "set\\s+security\\s+zones\\s+security-zone"
+      ],
+      "default": false
+    },
+    "vpn.remote_access_mfa_enabled": {
+      "patterns": [
+        "set\\s+security\\s+ike\\s+proposal",
+        "set\\s+security\\s+ike\\s+policy"
+      ],
+      "default": false
+    },
+    "auth.brute_force_lockout_enabled": {
+      "patterns": [
+        "set\\s+system\\s+login\\s+retry-options\\s+backoff-threshold"
+      ],
+      "default": false
+    },
+    "authz.command_authorization_enabled": {
+      "patterns": [
+        "set\\s+system\\s+login\\s+class\\s+\\S+\\s+permissions"
+      ],
+      "default": false
+    },
+    "routing.neighbor_auth_enabled": {
+      "patterns": [
+        "set\\s+protocols\\s+bgp\\s+group\\s+\\S+\\s+authentication-key",
+        "set\\s+protocols\\s+ospf\\s+area\\s+\\S+\\s+interface\\s+\\S+\\s+authentication"
+      ],
+      "default": false
+    },
+    "interface.l2_security_enabled": {
+      "patterns": [
+        "set\\s+ethernet-switching-options\\s+secure-access-port",
+        "set\\s+protocols\\s+rstp\\s+interface\\s+\\S+\\s+bpdu-block"
+      ],
+      "default": false
+    }
+  },
+  "remediations": {
+    "REM-SSH-01": {
+      "objective": "Enforce SSHv2 protocol and strong ciphers in Junos",
+      "cli_command": "set system services ssh protocol-version v2\nset system services ssh ciphers aes256-gcm@openssh.com aes128-gcm@openssh.com aes256-ctr\nset system services ssh macs hmac-sha2-512 hmac-sha2-256\ncommit comment \"Enforce SSHv2 and strong crypto\"",
+      "before_example": "set system services ssh protocol-version v1",
+      "after_example": "set system services ssh protocol-version v2\nset system services ssh ciphers aes256-gcm@openssh.com ...",
+      "verification_command": "show configuration system services ssh",
+      "rollback_command": "delete system services ssh ciphers\ncommit",
+      "impact_level": "LOW",
+      "explanation": "Configures Junos SSH daemon to reject v1 negotiations and use authenticated encryption ciphers."
+    },
+    "REM-TELNET-01": {
+      "objective": "Deactivate unencrypted Telnet service on Junos",
+      "cli_command": "delete system services telnet\ncommit comment \"Deactivate Telnet service\"",
+      "before_example": "set system services telnet",
+      "after_example": "! system services telnet removed",
+      "verification_command": "show configuration system services | match telnet",
+      "rollback_command": "set system services telnet\ncommit",
+      "impact_level": "LOW",
+      "explanation": "Removes telnet daemon stanza from system configuration."
+    },
+    "REM-HTTP-01": {
+      "objective": "Disable unencrypted HTTP J-Web management on Junos",
+      "cli_command": "delete system services web-management http\nset system services web-management https system-generated-certificate\ncommit comment \"Disable HTTP web management\"",
+      "before_example": "set system services web-management http",
+      "after_example": "set system services web-management https ...",
+      "verification_command": "show configuration system services web-management",
+      "rollback_command": "set system services web-management http\ncommit",
+      "impact_level": "LOW",
+      "explanation": "Deactivates unencrypted web management and binds TLS certificate to HTTPS."
+    },
+    "REM-HTTPS-01": {
+      "objective": "Enable HTTPS web management with TLS 1.2+ on Junos",
+      "cli_command": "set system services web-management https system-generated-certificate\nset system services web-management https tls-version 1.2 1.3\ncommit comment \"Enforce HTTPS TLS 1.2+\"",
+      "before_example": "! no web-management https",
+      "after_example": "set system services web-management https ...",
+      "verification_command": "show configuration system services web-management",
+      "rollback_command": "delete system services web-management https\ncommit",
+      "impact_level": "LOW",
+      "explanation": "Activates TLS web management."
+    },
+    "REM-SNMP-01": {
+      "objective": "Configure SNMPv3 USM/VACM and purge default communities on Junos",
+      "cli_command": "delete snmp community public\ndelete snmp community private\nset snmp v3 usm local-engine user secadmin authentication-sha authentication-password \"AuthPass2026!\"\nset snmp v3 usm local-engine user secadmin privacy-aes128 privacy-password \"PrivPass2026!\"\nset snmp v3 vacm security-to-group security-model usm security-name secadmin group SECGROUP\nset snmp v3 vacm access group SECGROUP default-context-prefix model usm level privacy read-view all-view\ncommit comment \"Configure SNMPv3 authPriv\"",
+      "before_example": "set snmp community public authorization read-only",
+      "after_example": "set snmp v3 usm local-engine user secadmin ...",
+      "verification_command": "show snmp v3",
+      "rollback_command": "delete snmp v3\ncommit",
+      "impact_level": "MEDIUM",
+      "explanation": "Purges plaintext communities and creates SNMPv3 USM user with SHA auth and AES privacy."
+    },
+    "REM-LOG-01": {
+      "objective": "Configure remote syslog logging on Junos",
+      "cli_command": "set system syslog host 10.100.20.50 any notice\nset system syslog host 10.100.20.50 authorization info\nset system syslog time-format millisecond\ncommit comment \"Configure remote syslog server\"",
+      "before_example": "set system syslog file messages any notice",
+      "after_example": "set system syslog host 10.100.20.50 any notice\nset system syslog time-format millisecond",
+      "verification_command": "show configuration system syslog",
+      "rollback_command": "delete system syslog host 10.100.20.50\ncommit",
+      "impact_level": "NONE",
+      "explanation": "Streams notice and authorization events to central SIEM."
+    },
+    "REM-NTP-01": {
+      "objective": "Configure redundant NTP time servers on Junos",
+      "cli_command": "set system ntp server 10.100.10.10 prefer\nset system ntp server 10.100.10.11\ncommit comment \"Configure NTP time sync\"",
+      "before_example": "! no ntp configured",
+      "after_example": "set system ntp server 10.100.10.10 prefer",
+      "verification_command": "show ntp associations",
+      "rollback_command": "delete system ntp\ncommit",
+      "impact_level": "NONE",
+      "explanation": "Binds authoritative time sources to local Junos daemon."
+    },
+    "REM-AAA-01": {
+      "objective": "Configure TACACS+ authentication order on Junos",
+      "cli_command": "set system tacplus-server 10.100.30.15 secret \"C1ph3rX!S3cur3K3y\"\nset system tacplus-server 10.100.30.15 timeout 5\nset system authentication-order [ tacplus password ]\ncommit comment \"Enforce TACACS+ authentication\"",
+      "before_example": "set system authentication-order [ password ]",
+      "after_example": "set system authentication-order [ tacplus password ]",
+      "verification_command": "show configuration system authentication-order",
+      "rollback_command": "delete system authentication-order\ncommit",
+      "impact_level": "HIGH",
+      "explanation": "Prioritizes centralized TACACS+ identity verification with local root fallback."
+    },
+    "REM-PASS-01": {
+      "objective": "Enforce 15-character minimum password length and SHA-512 hashing on Junos",
+      "cli_command": "set system login password minimum-length 15\nset system login password format sha-512\nset system login password change-frequency 90\ncommit comment \"Enforce 15 char minimum password length\"",
+      "before_example": "! no password policy",
+      "after_example": "set system login password minimum-length 15\nset system login password format sha-512",
+      "verification_command": "show configuration system login password",
+      "rollback_command": "delete system login password minimum-length\ncommit",
+      "impact_level": "LOW",
+      "explanation": "Configures system password complexity and SHA-512 salt."
+    },
+    "REM-TIMEOUT-01": {
+      "objective": "Set 10-minute administrative idle timeout on Junos",
+      "cli_command": "set system login idle-timeout 10\ncommit comment \"Set 10 min idle timeout\"",
+      "before_example": "! idle-timeout not configured (default unbounded)",
+      "after_example": "set system login idle-timeout 10",
+      "verification_command": "show configuration system login idle-timeout",
+      "rollback_command": "delete system login idle-timeout\ncommit",
+      "impact_level": "NONE",
+      "explanation": "Enforces automatic disconnect after 10 minutes of CLI inactivity."
+    },
+    "REM-CRYPTO-01": {
+      "objective": "Enforce strong ciphers and disable weak algorithms in Junos",
+      "cli_command": "set system services ssh ciphers [ aes256-gcm@openssh.com aes128-gcm@openssh.com aes256-ctr ]\ncommit comment \"Disable weak ciphers\"",
+      "before_example": "! default cipher set includes 3des",
+      "after_example": "set system services ssh ciphers [ aes256-gcm@openssh.com ... ]",
+      "verification_command": "show configuration system services ssh",
+      "rollback_command": "delete system services ssh ciphers\ncommit",
+      "impact_level": "LOW",
+      "explanation": "Restricts SSH to AES-GCM and AES-CTR suites."
+    },
+    "REM-UNUSED-01": {
+      "objective": "Disable auxiliary services (FTP, Finger) on Junos",
+      "cli_command": "delete system services ftp\ndelete system services finger\ndelete system services rlogin\ncommit comment \"Disable unused legacy services\"",
+      "before_example": "set system services ftp",
+      "after_example": "! ftp / finger removed",
+      "verification_command": "show configuration system services",
+      "rollback_command": "set system services ftp\ncommit",
+      "impact_level": "NONE",
+      "explanation": "Deactivates unneeded network service listeners."
+    },
+    "REM-MGMT-01": {
+      "objective": "Isolate management interface in dedicated management routing-instance on Junos",
+      "cli_command": "set routing-instances mgmt_junos description \"Out of Band Management VRF\"\nset routing-instances mgmt_junos routing-options static route 0.0.0.0/0 next-hop 192.168.100.1\nset interfaces fxp0 unit 0 family inet address 192.168.100.2/24\ncommit comment \"Isolate management plane\"",
+      "before_example": "set interfaces fxp0 unit 0 family inet address 192.168.100.2/24",
+      "after_example": "set routing-instances mgmt_junos ...",
+      "verification_command": "show route instance mgmt_junos",
+      "rollback_command": "delete routing-instances mgmt_junos\ncommit",
+      "impact_level": "HIGH",
+      "explanation": "Places fxp0 management interface into dedicated routing table."
+    },
+    "REM-ACL-01": {
+      "objective": "Bind stateless firewall filter with default discard term on Junos",
+      "cli_command": "set firewall family inet filter PROTECT-RE term PERMIT-SSH from protocol tcp\nset firewall family inet filter PROTECT-RE term PERMIT-SSH from port 22\nset firewall family inet filter PROTECT-RE term PERMIT-SSH then accept\nset firewall family inet filter PROTECT-RE term DEFAULT-DISCARD then log\nset firewall family inet filter PROTECT-RE term DEFAULT-DISCARD then discard\nset interfaces lo0 unit 0 family inet filter input PROTECT-RE\ncommit comment \"Enforce Routing Engine firewall filter\"",
+      "before_example": "set interfaces lo0 unit 0 family inet address 10.255.255.1/32",
+      "after_example": "set interfaces lo0 unit 0 family inet filter input PROTECT-RE",
+      "verification_command": "show configuration firewall family inet filter PROTECT-RE",
+      "rollback_command": "delete interfaces lo0 unit 0 family inet filter input\ncommit",
+      "impact_level": "MEDIUM",
+      "explanation": "Filters loopback control plane packets with explicit logging discard."
+    },
+    "REM-FW-01": {
+      "objective": "Configure SRX security zones and stateful policies",
+      "cli_command": "set security zones security-zone TRUST interfaces ge-0/0/0.0 host-inbound-traffic system-services [ ssh ping ]\nset security zones security-zone UNTRUST interfaces ge-0/0/1.0\nset security policies from-zone TRUST to-zone UNTRUST policy ALLOW-WEB match source-address any destination-address any application [ junos-http junos-https ]\nset security policies from-zone TRUST to-zone UNTRUST policy ALLOW-WEB then permit\ncommit comment \"Configure stateful zone policy\"",
+      "before_example": "! no security zones defined",
+      "after_example": "set security zones security-zone TRUST ...",
+      "verification_command": "show security policies",
+      "rollback_command": "delete security policies\ncommit",
+      "impact_level": "HIGH",
+      "explanation": "Instantiates stateful flow processing between Trust and Untrust zones."
+    },
+    "REM-REMOTE-01": {
+      "objective": "Configure IKEv2 proposal with AES-256-GCM on Junos SRX",
+      "cli_command": "set security ike proposal IKEV2-SEC-PROP authentication-method pre-shared-keys\nset security ike proposal IKEV2-SEC-PROP dh-group group19\nset security ike proposal IKEV2-SEC-PROP encryption-algorithm aes-256-gcm\nset security ike proposal IKEV2-SEC-PROP lifetime-seconds 28800\ncommit comment \"Enforce IKEv2 AES-256-GCM\"",
+      "before_example": "set security ike proposal IKE-PROP encryption-algorithm 3des-cbc",
+      "after_example": "set security ike proposal IKEV2-SEC-PROP encryption-algorithm aes-256-gcm",
+      "verification_command": "show security ike proposals",
+      "rollback_command": "delete security ike proposal IKEV2-SEC-PROP\ncommit",
+      "impact_level": "MEDIUM",
+      "explanation": "Enforces modern elliptic curve Diffie-Hellman and GCM encryption."
+    },
+    "REM-AUTH-01": {
+      "objective": "Configure login retry lockout threshold on Junos",
+      "cli_command": "set system login retry-options backoff-threshold 3\nset system login retry-options backoff-factor 5\nset system login retry-options tries-before-disconnect 4\ncommit comment \"Enforce brute-force retry backoff\"",
+      "before_example": "! retry options not set",
+      "after_example": "set system login retry-options backoff-threshold 3",
+      "verification_command": "show configuration system login retry-options",
+      "rollback_command": "delete system login retry-options\ncommit",
+      "impact_level": "LOW",
+      "explanation": "Delays subsequent login attempts exponentially after 3 failed attempts."
+    },
+    "REM-AUTHZ-01": {
+      "objective": "Configure granular login permission classes on Junos",
+      "cli_command": "set system login class SEC-OPERATOR permissions [ view network ]\nset system login class SEC-OPERATOR allow-commands \"show (interfaces|chassis|bgp)\"\nset system login class SEC-OPERATOR deny-commands \"request|restart|test\"\ncommit comment \"Configure granular RBAC permissions\"",
+      "before_example": "set system login class OPERATOR permissions all",
+      "after_example": "set system login class SEC-OPERATOR permissions [ view network ] ...",
+      "verification_command": "show configuration system login class SEC-OPERATOR",
+      "rollback_command": "delete system login class SEC-OPERATOR\ncommit",
+      "impact_level": "HIGH",
+      "explanation": "Restricts operator class to read-only network inspection commands."
+    },
+    "REM-ROUTING-01": {
+      "objective": "Configure MD5 neighbor authentication on BGP & OSPF in Junos",
+      "cli_command": "set protocols bgp group EXTERNAL-PEERS authentication-key \"$9$BGP_S3cur3!\"\nset protocols ospf area 0.0.0.0 interface ge-0/0/0.0 authentication md5 1 key \"$9$OSPF_S3cur3!\"\ncommit comment \"Enforce routing protocol authentication\"",
+      "before_example": "set protocols bgp group EXTERNAL-PEERS peer-as 65002",
+      "after_example": "set protocols bgp group EXTERNAL-PEERS authentication-key ...",
+      "verification_command": "show configuration protocols bgp",
+      "rollback_command": "delete protocols bgp group EXTERNAL-PEERS authentication-key\ncommit",
+      "impact_level": "MEDIUM",
+      "explanation": "Applies cryptographic message authentication to dynamic routing packets."
+    },
+    "REM-IFSEC-01": {
+      "objective": "Enable MAC limiting and BPDU block on access switchports in Junos",
+      "cli_command": "set ethernet-switching-options secure-access-port interface ge-0/0/0.0 mac-limit 2\nset ethernet-switching-options secure-access-port interface ge-0/0/0.0 action-on-overflow-packet drop-and-log\nset protocols rstp interface ge-0/0/0.0 bpdu-block\ncommit comment \"Enforce access port security and BPDU block\"",
+      "before_example": "set interfaces ge-0/0/0 unit 0 family ethernet-switching",
+      "after_example": "set ethernet-switching-options secure-access-port ...\nset protocols rstp interface ge-0/0/0.0 bpdu-block",
+      "verification_command": "show ethernet-switching-options secure-access-port interface ge-0/0/0.0",
+      "rollback_command": "delete ethernet-switching-options secure-access-port\ncommit",
+      "impact_level": "LOW",
+      "explanation": "Drops packets from unlearned MACs and blocks unexpected STP bridge protocol data units."
+    }
+  }
+}

@@ -1,0 +1,384 @@
+{
+  "vendor": "cisco",
+  "display_name": "Cisco Systems (IOS / IOS-XE / NX-OS)",
+  "platforms": ["ios", "ios-xe", "nx-os"],
+  "detection_patterns": [
+    "^!\\s*IOS",
+    "Current configuration\\s*:",
+    "Building configuration...",
+    "version\\s+\\d+\\.\\d+",
+    "hostname\\s+\\S+"
+  ],
+  "parameter_extractors": {
+    "ssh.version": {
+      "patterns": [
+        "ip\\s+ssh\\s+version\\s+(?P<val>\\d+)",
+        "ip\\s+ssh\\s+server\\s+algorithm\\s+encryption\\s+(?P<val>aes\\S+)"
+      ],
+      "default": 1
+    },
+    "ssh.enabled": {
+      "patterns": [
+        "transport\\s+input\\s+.*ssh",
+        "ip\\s+ssh"
+      ],
+      "default": false
+    },
+    "telnet.enabled": {
+      "patterns": [
+        "transport\\s+input\\s+.*telnet",
+        "transport\\s+input\\s+all"
+      ],
+      "default": false
+    },
+    "http.server_enabled": {
+      "patterns": [
+        "^ip\\s+http\\s+server"
+      ],
+      "negative_patterns": [
+        "^no\\s+ip\\s+http\\s+server"
+      ],
+      "default": false
+    },
+    "https.server_enabled": {
+      "patterns": [
+        "^ip\\s+http\\s+secure-server"
+      ],
+      "negative_patterns": [
+        "^no\\s+ip\\s+http\\s+secure-server"
+      ],
+      "default": false
+    },
+    "snmp.version": {
+      "patterns": [
+        "snmp-server\\s+group\\s+\\S+\\s+v3\\s+priv"
+      ],
+      "default": "v2c"
+    },
+    "snmp.has_default_community": {
+      "patterns": [
+        "snmp-server\\s+community\\s+(public|private)"
+      ],
+      "default": false
+    },
+    "logging.remote_server_configured": {
+      "patterns": [
+        "logging\\s+host\\s+\\S+",
+        "logging\\s+server\\s+\\S+"
+      ],
+      "default": false
+    },
+    "logging.timestamp_precision": {
+      "patterns": [
+        "service\\s+timestamps\\s+log\\s+datetime\\s+(?P<val>msec)"
+      ],
+      "default": "none"
+    },
+    "ntp.configured": {
+      "patterns": [
+        "ntp\\s+server\\s+\\S+"
+      ],
+      "default": false
+    },
+    "aaa.centralized_enabled": {
+      "patterns": [
+        "aaa\\s+new-model",
+        "aaa\\s+authentication\\s+login\\s+default\\s+group\\s+(tacacs\\+|radius)"
+      ],
+      "default": false
+    },
+    "password.min_length": {
+      "patterns": [
+        "security\\s+passwords\\s+min-length\\s+(?P<val>\\d+)"
+      ],
+      "default": 6
+    },
+    "password.strong_hashing_enabled": {
+      "patterns": [
+        "enable\\s+algorithm-type\\s+sha-512\\s+secret",
+        "enable\\s+secret\\s+9\\s+"
+      ],
+      "default": false
+    },
+    "session.inactivity_timeout_minutes": {
+      "patterns": [
+        "exec-timeout\\s+(?P<val>\\d+)\\s+\\d+"
+      ],
+      "default": 30
+    },
+    "crypto.weak_ciphers_prohibited": {
+      "negative_patterns": [
+        "crypto\\s+ipsec\\s+transform-set\\s+\\S+\\s+esp-des",
+        "crypto\\s+ipsec\\s+transform-set\\s+\\S+\\s+esp-3des"
+      ],
+      "default": true
+    },
+    "services.unused_services_disabled": {
+      "patterns": [
+        "no\\s+service\\s+finger",
+        "no\\s+service\\s+pad"
+      ],
+      "default": false
+    },
+    "mgmt.plane_isolated": {
+      "patterns": [
+        "ip\\s+vrf\\s+(Mgmt-intf|MGMT|management)",
+        "vrf\\s+definition\\s+(Mgmt-intf|MGMT|management)",
+        "control-plane"
+      ],
+      "default": false
+    },
+    "acl.configured_with_default_deny": {
+      "patterns": [
+        "access-list\\s+\\d+\\s+deny\\s+any",
+        "deny\\s+ip\\s+any\\s+any\\s+log"
+      ],
+      "default": false
+    },
+    "firewall.stateful_inspection_enabled": {
+      "patterns": [
+        "ip\\s+inspect\\s+name",
+        "zone\\s+security",
+        "policy-map\\s+type\\s+inspect"
+      ],
+      "default": false
+    },
+    "vpn.remote_access_mfa_enabled": {
+      "patterns": [
+        "crypto\\s+ikev2\\s+policy",
+        "aaa-server\\s+\\S+\\s+protocol\\s+tacacs\\+"
+      ],
+      "default": false
+    },
+    "auth.brute_force_lockout_enabled": {
+      "patterns": [
+        "login\\s+block-for\\s+\\d+\\s+attempts\\s+\\d+\\s+within\\s+\\d+"
+      ],
+      "default": false
+    },
+    "authz.command_authorization_enabled": {
+      "patterns": [
+        "aaa\\s+authorization\\s+exec\\s+default\\s+group",
+        "aaa\\s+authorization\\s+commands"
+      ],
+      "default": false
+    },
+    "routing.neighbor_auth_enabled": {
+      "patterns": [
+        "neighbor\\s+\\S+\\s+password",
+        "ip\\s+ospf\\s+message-digest-key"
+      ],
+      "default": false
+    },
+    "interface.l2_security_enabled": {
+      "patterns": [
+        "switchport\\s+port-security",
+        "spanning-tree\\s+bpduguard\\s+enable",
+        "storm-control\\s+broadcast"
+      ],
+      "default": false
+    }
+  },
+  "remediations": {
+    "REM-SSH-01": {
+      "objective": "Enforce SSHv2 and disable SSHv1 on Cisco IOS/IOS-XE",
+      "cli_command": "configure terminal\nip domain name enterprise.net\ncrypto key generate rsa modulus 4096\nip ssh version 2\nip ssh time-out 60\nip ssh authentication-retries 3\nline vty 0 15\n transport input ssh\nend\nwrite memory",
+      "before_example": "line vty 0 4\n transport input telnet ssh",
+      "after_example": "ip ssh version 2\nline vty 0 15\n transport input ssh",
+      "verification_command": "show ip ssh",
+      "rollback_command": "configure terminal\nline vty 0 15\n transport input all\nend",
+      "impact_level": "LOW",
+      "explanation": "Generates 4096-bit RSA keys, mandates SSHv2 protocol, sets 60s handshake timeout, and locks VTY lines to SSH."
+    },
+    "REM-TELNET-01": {
+      "objective": "Disable Telnet protocol across all VTY transport lines",
+      "cli_command": "configure terminal\nline vty 0 15\n transport input ssh\n transport output none\nend\nwrite memory",
+      "before_example": "line vty 0 4\n transport input telnet ssh",
+      "after_example": "line vty 0 15\n transport input ssh",
+      "verification_command": "show running-config | section line vty",
+      "rollback_command": "configure terminal\nline vty 0 15\n transport input telnet ssh\nend",
+      "impact_level": "LOW",
+      "explanation": "Removes telnet from allowed transport protocols on virtual terminal lines."
+    },
+    "REM-HTTP-01": {
+      "objective": "Disable unencrypted HTTP server daemon",
+      "cli_command": "configure terminal\nno ip http server\nip http secure-server\nend\nwrite memory",
+      "before_example": "ip http server",
+      "after_example": "no ip http server\nip http secure-server",
+      "verification_command": "show running-config | include ip http",
+      "rollback_command": "configure terminal\nip http server\nend",
+      "impact_level": "LOW",
+      "explanation": "Shuts down cleartext port 80 web management daemon."
+    },
+    "REM-HTTPS-01": {
+      "objective": "Enable secure HTTPS server with TLS",
+      "cli_command": "configure terminal\nip http secure-server\nip http secure-ciphersuite aes-256-cbc-sha\nend\nwrite memory",
+      "before_example": "no ip http secure-server",
+      "after_example": "ip http secure-server",
+      "verification_command": "show ip http server secure status",
+      "rollback_command": "configure terminal\nno ip http secure-server\nend",
+      "impact_level": "LOW",
+      "explanation": "Activates TLS encrypted administrative web portal."
+    },
+    "REM-SNMP-01": {
+      "objective": "Configure SNMPv3 with authPriv and remove default communities",
+      "cli_command": "configure terminal\nno snmp-server community public\nno snmp-server community private\nsnmp-server group SECGROUP v3 priv\nsnmp-server user secadmin SECGROUP v3 auth sha-256 AuthPass2026! priv aes 256 PrivPass2026!\nend\nwrite memory",
+      "before_example": "snmp-server community public RO",
+      "after_example": "snmp-server group SECGROUP v3 priv\nsnmp-server user secadmin SECGROUP v3 auth sha-256 ... priv aes 256 ...",
+      "verification_command": "show snmp group\nshow snmp user",
+      "rollback_command": "configure terminal\nno snmp-server user secadmin SECGROUP v3\nno snmp-server group SECGROUP v3\nend",
+      "impact_level": "MEDIUM",
+      "explanation": "Removes standard community strings and creates an authenticated and encrypted SNMPv3 security group."
+    },
+    "REM-LOG-01": {
+      "objective": "Configure centralized syslog logging with millisecond timestamps",
+      "cli_command": "configure terminal\nservice timestamps log datetime msec localtime show-timezone\nlogging buffered 64000 informational\nlogging host 10.100.20.50 transport udp port 514\nlogging trap informational\nlogging source-interface Loopback0\nend\nwrite memory",
+      "before_example": "no logging buffered\n! no logging host configured",
+      "after_example": "service timestamps log datetime msec\nlogging host 10.100.20.50\nlogging trap informational",
+      "verification_command": "show logging",
+      "rollback_command": "configure terminal\nno logging host 10.100.20.50\nend",
+      "impact_level": "NONE",
+      "explanation": "Redirects informational and higher audit records to enterprise SIEM collector."
+    },
+    "REM-NTP-01": {
+      "objective": "Configure synchronized authoritative NTP servers",
+      "cli_command": "configure terminal\nntp server 10.100.10.10 prefer\nntp server 10.100.10.11\nntp authenticate\nend\nwrite memory",
+      "before_example": "! no ntp servers configured",
+      "after_example": "ntp server 10.100.10.10 prefer\nntp server 10.100.10.11",
+      "verification_command": "show ntp status\nshow ntp associations",
+      "rollback_command": "configure terminal\nno ntp server 10.100.10.10\nno ntp server 10.100.10.11\nend",
+      "impact_level": "NONE",
+      "explanation": "Synchronizes system clock against redundant enterprise time sources."
+    },
+    "REM-AAA-01": {
+      "objective": "Enforce centralized AAA authentication via TACACS+/RADIUS",
+      "cli_command": "configure terminal\naaa new-model\ntacacs server TACACS-SRV\n address ipv4 10.100.30.15\n key 6 C1ph3rX!S3cur3K3y\naaa group server tacacs+ TACACS-GRP\n server name TACACS-SRV\naaa authentication login default group TACACS-GRP local\naaa authorization exec default group TACACS-GRP local\naaa accounting exec default start-stop group TACACS-GRP\nend\nwrite memory",
+      "before_example": "no aaa new-model\nusername admin password 0 admin",
+      "after_example": "aaa new-model\naaa authentication login default group TACACS-GRP local",
+      "verification_command": "show aaa servers",
+      "rollback_command": "configure terminal\nno aaa new-model\nend",
+      "impact_level": "HIGH",
+      "explanation": "Activates AAA framework and establishes TACACS+ cluster authentication with local emergency fallback."
+    },
+    "REM-PASS-01": {
+      "objective": "Enforce minimum 15-character password length and SHA-512 secret hashing",
+      "cli_command": "configure terminal\nsecurity passwords min-length 15\nenable algorithm-type sha-512 secret StrongEnableSecret2026!\nend\nwrite memory",
+      "before_example": "enable password 7 0822404F1A0A\nsecurity passwords min-length 6",
+      "after_example": "security passwords min-length 15\nenable algorithm-type sha-512 secret ...",
+      "verification_command": "show running-config | include security passwords|enable algorithm",
+      "rollback_command": "configure terminal\nsecurity passwords min-length 6\nend",
+      "impact_level": "LOW",
+      "explanation": "Mandates 15-character length threshold and replaces legacy MD5/Type 7 secrets with salted Type 9 SHA-512 hashes."
+    },
+    "REM-TIMEOUT-01": {
+      "objective": "Set 10-minute administrative inactivity timeout on all management lines",
+      "cli_command": "configure terminal\nline con 0\n exec-timeout 10 0\nline vty 0 15\n exec-timeout 10 0\nend\nwrite memory",
+      "before_example": "line vty 0 4\n exec-timeout 0 0",
+      "after_example": "line vty 0 15\n exec-timeout 10 0",
+      "verification_command": "show running-config | section line",
+      "rollback_command": "configure terminal\nline vty 0 15\n exec-timeout 30 0\nend",
+      "impact_level": "NONE",
+      "explanation": "Sets 10 min 0 sec inactivity limit on console and VTY lines."
+    },
+    "REM-CRYPTO-01": {
+      "objective": "Disable weak ciphers and enforce AES-256-GCM / SHA-512",
+      "cli_command": "configure terminal\nip ssh server algorithm encryption aes256-ctr aes192-ctr aes128-ctr\nip ssh server algorithm mac hmac-sha2-512 hmac-sha2-256\nend\nwrite memory",
+      "before_example": "! weak 3des / cbc ciphers allowed",
+      "after_example": "ip ssh server algorithm encryption aes256-ctr ...",
+      "verification_command": "show ip ssh | include Algorithm",
+      "rollback_command": "configure terminal\nno ip ssh server algorithm encryption\nend",
+      "impact_level": "LOW",
+      "explanation": "Restricts SSH encryption and integrity to AES-CTR and HMAC-SHA2."
+    },
+    "REM-UNUSED-01": {
+      "objective": "Disable unnecessary small servers and finger services",
+      "cli_command": "configure terminal\nno service finger\nno service pad\nno service udp-small-servers\nno service tcp-small-servers\nno ip bootp server\nend\nwrite memory",
+      "before_example": "service finger\nservice tcp-small-servers",
+      "after_example": "no service finger\nno service pad\nno service udp-small-servers\nno service tcp-small-servers",
+      "verification_command": "show running-config | include service",
+      "rollback_command": "configure terminal\nservice finger\nend",
+      "impact_level": "NONE",
+      "explanation": "Closes legacy utility ports and deactivates unused auxiliary daemons."
+    },
+    "REM-MGMT-01": {
+      "objective": "Isolate management plane into dedicated VRF and configure Control Plane Policing",
+      "cli_command": "configure terminal\nvrf definition MGMT\n address-family ipv4\n exit-address-family\ninterface GigabitEthernet0/0\n vrf forwarding MGMT\n ip address 192.168.100.2 255.255.255.0\n no shutdown\ncontrol-plane\n service-policy input CoPP-Policy\nend\nwrite memory",
+      "before_example": "interface GigabitEthernet0/0\n ip address 192.168.100.2 255.255.255.0",
+      "after_example": "vrf definition MGMT\ninterface GigabitEthernet0/0\n vrf forwarding MGMT",
+      "verification_command": "show vrf\nshow policy-map control-plane",
+      "rollback_command": "configure terminal\ninterface GigabitEthernet0/0\n no vrf forwarding MGMT\nend",
+      "impact_level": "HIGH",
+      "explanation": "Separates control/management plane traffic from routing data plane."
+    },
+    "REM-ACL-01": {
+      "objective": "Bind interface ACLs with explicit default deny and logging",
+      "cli_command": "configure terminal\nip access-list extended INGRESS-FILTER\n permit tcp any any established\n permit tcp 10.0.0.0 0.255.255.255 host 10.100.1.1 eq 22\n deny ip any any log-input\ninterface GigabitEthernet0/1\n ip access-group INGRESS-FILTER in\nend\nwrite memory",
+      "before_example": "interface GigabitEthernet0/1\n ! no ip access-group",
+      "after_example": "interface GigabitEthernet0/1\n ip access-group INGRESS-FILTER in",
+      "verification_command": "show ip access-lists INGRESS-FILTER",
+      "rollback_command": "configure terminal\ninterface GigabitEthernet0/1\n no ip access-group INGRESS-FILTER in\nend",
+      "impact_level": "MEDIUM",
+      "explanation": "Enforces boundary traffic inspection with explicit deny-all logging."
+    },
+    "REM-FW-01": {
+      "objective": "Enable Zone-Based Firewall inspection and drop unassigned traffic",
+      "cli_command": "configure terminal\nzone security INSIDE\nzone security OUTSIDE\nzone-pair security ZP-IN-OUT source INSIDE destination OUTSIDE\n service-policy type inspect ZBFW-POLICY\nend\nwrite memory",
+      "before_example": "! no zone-based firewall active",
+      "after_example": "zone security INSIDE\nzone-pair security ZP-IN-OUT ...",
+      "verification_command": "show policy-map type inspect zone-pair",
+      "rollback_command": "configure terminal\nno zone-pair security ZP-IN-OUT\nend",
+      "impact_level": "HIGH",
+      "explanation": "Instantiates stateful protocol inspection between security zones."
+    },
+    "REM-REMOTE-01": {
+      "objective": "Configure IKEv2 and strong AES-GCM cipher suites for VPN tunnels",
+      "cli_command": "configure terminal\ncrypto ikev2 proposal IKEV2-STRONG\n encryption aes-gcm-256\n prf sha384\n group 19 20\nend\nwrite memory",
+      "before_example": "crypto isakmp policy 10\n encr 3des\n hash md5",
+      "after_example": "crypto ikev2 proposal IKEV2-STRONG\n encryption aes-gcm-256",
+      "verification_command": "show crypto ikev2 proposal",
+      "rollback_command": "configure terminal\nno crypto ikev2 proposal IKEV2-STRONG\nend",
+      "impact_level": "MEDIUM",
+      "explanation": "Upgrades IPsec phase 1 to IKEv2 with elliptic curve Diffie-Hellman groups."
+    },
+    "REM-AUTH-01": {
+      "objective": "Enable login failure rate limiting (lockout after 3 failures)",
+      "cli_command": "configure terminal\nlogin block-for 300 attempts 3 within 60\nlogin quiet-mode access-class ADMIN-ONLY\nlogin on-failure log\nlogin on-success log\nend\nwrite memory",
+      "before_example": "! no login block-for configured",
+      "after_example": "login block-for 300 attempts 3 within 60",
+      "verification_command": "show login",
+      "rollback_command": "configure terminal\nno login block-for\nend",
+      "impact_level": "LOW",
+      "explanation": "Blocks administrative login attempts for 5 minutes after 3 failures in 60 seconds."
+    },
+    "REM-AUTHZ-01": {
+      "objective": "Enforce AAA command authorization for privilege level 15",
+      "cli_command": "configure terminal\naaa authorization exec default group TACACS-GRP local\naaa authorization commands 15 default group TACACS-GRP local\nend\nwrite memory",
+      "before_example": "no aaa authorization commands",
+      "after_example": "aaa authorization commands 15 default group TACACS-GRP local",
+      "verification_command": "show running-config | include aaa authorization",
+      "rollback_command": "configure terminal\nno aaa authorization commands 15 default\nend",
+      "impact_level": "HIGH",
+      "explanation": "Validates every executive configuration command against centralized authorization server."
+    },
+    "REM-ROUTING-01": {
+      "objective": "Configure MD5/SHA neighbor authentication on BGP & OSPF sessions",
+      "cli_command": "configure terminal\nrouter bgp 65001\n neighbor 192.168.1.1 password 8 BGP$3cur3P@ss!\n neighbor 192.168.1.1 ttl-security hops 2\ninterface GigabitEthernet0/1\n ip ospf message-digest-key 1 md5 OSPF$3cur3K3y!\nend\nwrite memory",
+      "before_example": "neighbor 192.168.1.1 remote-as 65002\n! no password configured",
+      "after_example": "neighbor 192.168.1.1 password ...\nneighbor 192.168.1.1 ttl-security hops 2",
+      "verification_command": "show ip bgp neighbors 192.168.1.1",
+      "rollback_command": "configure terminal\nrouter bgp 65001\n no neighbor 192.168.1.1 password\nend",
+      "impact_level": "MEDIUM",
+      "explanation": "Protects dynamic routing sessions from unauthorized route injection or spoofing."
+    },
+    "REM-IFSEC-01": {
+      "objective": "Enable Port Security, BPDU Guard, and Storm Control on edge switchports",
+      "cli_command": "configure terminal\ninterface range GigabitEthernet1/0/1 - 24\n switchport mode access\n switchport port-security\n switchport port-security maximum 2\n switchport port-security violation shutdown\n spanning-tree bpduguard enable\n storm-control broadcast level 5.00\nend\nwrite memory",
+      "before_example": "interface GigabitEthernet1/0/1\n switchport mode access",
+      "after_example": "switchport port-security\nspanning-tree bpduguard enable\nstorm-control broadcast level 5.00",
+      "verification_command": "show port-security\nshow spanning-tree summary",
+      "rollback_command": "configure terminal\ninterface range GigabitEthernet1/0/1 - 24\n no switchport port-security\n no spanning-tree bpduguard enable\nend",
+      "impact_level": "LOW",
+      "explanation": "Mitigates MAC address flooding, rogue switch STP root hijack, and broadcast storms."
+    }
+  }
+}

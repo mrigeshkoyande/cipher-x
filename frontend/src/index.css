@@ -1,0 +1,204 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #070B14;
+  --bg-secondary: #0D1527;
+  --bg-card: rgba(13, 21, 39, 0.75);
+  --bg-card-hover: rgba(22, 32, 56, 0.85);
+  --border-color: rgba(59, 130, 246, 0.18);
+  --border-glow: rgba(0, 240, 255, 0.4);
+  --accent-cyan: #00F0FF;
+  --accent-blue: #3B82F6;
+  --accent-emerald: #10B981;
+  --accent-amber: #F59E0B;
+  --accent-crimson: #EF4444;
+  --accent-purple: #8B5CF6;
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-primary);
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(0, 240, 255, 0.04) 0%, transparent 40%),
+    radial-gradient(circle at 85% 85%, rgba(59, 130, 246, 0.05) 0%, transparent 40%),
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, .font-heading {
+  font-family: 'Outfit', 'Inter', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+code, pre, .font-mono {
+  font-family: 'Fira Code', monospace;
+}
+
+/* Glassmorphism Styles */
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-panel:hover {
+  border-color: rgba(0, 240, 255, 0.3);
+  box-shadow: 0 12px 40px 0 rgba(0, 240, 255, 0.08);
+}
+
+.glass-panel-glow {
+  background: linear-gradient(135deg, rgba(13, 21, 39, 0.85) 0%, rgba(22, 32, 56, 0.6) 100%);
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.15);
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1E293B;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Cyber Badges */
+.badge-critical {
+  background: rgba(239, 68, 68, 0.15);
+  color: #F87171;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.badge-high {
+  background: rgba(249, 115, 22, 0.15);
+  color: #FB923C;
+  border: 1px solid rgba(249, 115, 22, 0.35);
+}
+
+.badge-medium {
+  background: rgba(245, 158, 11, 0.15);
+  color: #FBBF24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.badge-low {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60A5FA;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+}
+
+.badge-pass {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34D399;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.badge-unknown {
+  background: rgba(139, 92, 246, 0.15);
+  color: #A78BFA;
+  border: 1px solid rgba(139, 92, 246, 0.35);
+}
+
+/* Glowing buttons */
+.btn-cyber-primary {
+  background: linear-gradient(135deg, #00F0FF 0%, #3B82F6 100%);
+  color: #050B14;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 8px 16px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(0, 240, 255, 0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-cyber-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 240, 255, 0.4);
+}
+
+.btn-cyber-secondary {
+  background: rgba(15, 23, 42, 0.8);
+  color: #E2E8F0;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 8px 16px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.btn-cyber-secondary:hover {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: #00F0FF;
+  color: #00F0FF;
+}
+
+/* Pulsing Status Dot */
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(0, 240, 255, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 240, 255, 0); }
+}
+
+/* Scan line effect */
+.scan-line {
+  position: relative;
+  overflow: hidden;
+}
+
+.scan-line::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.8), transparent);
+  animation: scan-move 4s linear infinite;
+  opacity: 0.6;
+}
+
+@keyframes scan-move {
+  0% { top: 0%; }
+  100% { top: 100%; }
+}

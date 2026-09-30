@@ -1,0 +1,33 @@
+{
+  "id": "ISO-27001",
+  "name": "ISO/IEC 27001:2022",
+  "version": "2022",
+  "description": "International standard for managing information security, Annex A controls.",
+  "authority": "International Organization for Standardization",
+  "categories": [
+    "A.8 - Technological Controls",
+    "A.5 - Organizational Controls"
+  ],
+  "control_mappings": {
+    "A.8.20": "CTRL-SSH-01",
+    "A.8.21": "CTRL-TELNET-01",
+    "A.8.22": "CTRL-HTTP-01",
+    "A.8.24": "CTRL-HTTPS-01",
+    "A.8.15": "CTRL-SNMP-01",
+    "A.8.16": "CTRL-LOG-01",
+    "A.8.17": "CTRL-NTP-01",
+    "A.5.15": "CTRL-AAA-01",
+    "A.5.17": "CTRL-PASS-01",
+    "A.8.19": "CTRL-TIMEOUT-01",
+    "A.8.24(1)": "CTRL-CRYPTO-01",
+    "A.8.9": "CTRL-UNUSED-01",
+    "A.8.18": "CTRL-MGMT-01",
+    "A.8.20(1)": "CTRL-ACL-01",
+    "A.8.20(2)": "CTRL-FW-01",
+    "A.8.23": "CTRL-REMOTE-01",
+    "A.5.16": "CTRL-AUTH-01",
+    "A.5.18": "CTRL-AUTHZ-01",
+    "A.8.20(3)": "CTRL-ROUTING-01",
+    "A.8.20(4)": "CTRL-IFSEC-01"
+  }
+}
