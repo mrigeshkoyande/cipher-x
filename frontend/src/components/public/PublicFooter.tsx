@@ -6,8 +6,10 @@ export function PublicFooter() {
   return (
     <footer
       style={{
-        background: '#070C0A',
-        borderTop: '1px solid #1E2822',
+        background: 'rgba(7, 12, 10, 0.75)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        borderTop: '1px solid rgba(48, 56, 51, 0.5)',
         color: '#AAB2A8',
         padding: '64px 24px 32px',
         fontSize: 13,

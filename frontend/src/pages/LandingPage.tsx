@@ -26,56 +26,79 @@ export function LandingPage() {
   ];
 
   return (
-    <div style={{ background: '#050914', color: '#F2F4EA', minHeight: '100vh', overflowX: 'hidden' }}>
-      {/* Navigation */}
-      <PublicNavbar />
-
-      {/* SECTION 1 — HERO */}
-      <section
+    <div style={{ position: 'relative', background: '#050914', color: '#F2F4EA', minHeight: '100vh', overflowX: 'hidden' }}>
+      {/* Background Translucent Video — Landing Page Only */}
+      <div
         style={{
-          position: 'relative',
-          paddingTop: 140,
-          paddingBottom: 80,
-          background: 'radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255, 116, 23, 0.12) 0%, rgba(5, 9, 20, 0) 100%)',
-          borderBottom: '1px solid rgba(48, 56, 51, 0.5)',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          zIndex: 0,
+          pointerEvents: 'none',
+          overflow: 'hidden',
         }}
+        aria-hidden="true"
       >
-        <div style={{ maxWidth: 1320, margin: '0 auto', padding: '0 24px' }}>
-          {/* Subtitle pill */}
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
-            <div
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          src="/landing-bg.mp4"
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            minWidth: '100%',
+            minHeight: '100%',
+            width: 'auto',
+            height: 'auto',
+            transform: 'translate(-50%, -50%)',
+            objectFit: 'cover',
+            opacity: 0.35,
+            filter: 'contrast(1.15) brightness(0.85)',
+          }}
+        />
+        {/* Subtle dark gradient overlay to ensure text readability across the entire page */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'radial-gradient(ellipse 90% 70% at 50% 30%, rgba(5, 9, 20, 0.65) 0%, rgba(5, 9, 20, 0.88) 100%)',
+          }}
+        />
+      </div>
+
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        {/* Navigation */}
+        <PublicNavbar />
+
+        {/* SECTION 1 — HERO */}
+        <section
+          style={{
+            position: 'relative',
+            paddingTop: 140,
+            paddingBottom: 80,
+            background: 'radial-gradient(ellipse 80% 50% at 50% -10%, rgba(255, 116, 23, 0.12) 0%, rgba(5, 9, 20, 0.3) 100%)',
+            borderBottom: '1px solid rgba(48, 56, 51, 0.5)',
+          }}
+        >
+          <div style={{ maxWidth: 1320, margin: '0 auto', padding: '0 24px' }}>
+            {/* Main Headline */}
+            <h1
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                background: 'rgba(255, 116, 23, 0.1)',
-                border: '1px solid rgba(255, 116, 23, 0.3)',
-                padding: '6px 14px',
-                borderRadius: 20,
-                fontSize: 12,
-                fontWeight: 600,
-                color: '#FF7417',
-                letterSpacing: '0.04em',
+                fontSize: 'clamp(36px, 5.5vw, 64px)',
+                fontWeight: 800,
+                textAlign: 'center',
+                lineHeight: 1.1,
+                letterSpacing: '-0.02em',
+                maxWidth: 960,
+                margin: '0 auto 20px',
+                color: '#F2F4EA',
               }}
             >
-              <Sparkles size={13} />
-              AI-POWERED MULTI-VENDOR NETWORK COMPLIANCE
-            </div>
-          </div>
-
-          {/* Main Headline */}
-          <h1
-            style={{
-              fontSize: 'clamp(36px, 5.5vw, 64px)',
-              fontWeight: 800,
-              textAlign: 'center',
-              lineHeight: 1.1,
-              letterSpacing: '-0.02em',
-              maxWidth: 960,
-              margin: '0 auto 20px',
-              color: '#F2F4EA',
-            }}
-          >
             Turn Network Configurations Into{' '}
             <span style={{ color: '#FF7417', textShadow: '0 0 28px rgba(255, 116, 23, 0.35)' }}>
               Security Intelligence.
@@ -145,7 +168,7 @@ export function LandingPage() {
       </section>
 
       {/* SECTION 2 — HERO PRODUCT PREVIEW */}
-      <section style={{ padding: '60px 24px', background: '#090E17', borderBottom: '1px solid #1E2822' }}>
+      <section style={{ padding: '60px 24px', background: 'rgba(9, 14, 23, 0.65)', backdropFilter: 'blur(8px)', borderBottom: '1px solid rgba(48, 56, 51, 0.5)' }}>
         <div style={{ maxWidth: 1320, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 28 }}>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', color: '#FF7417', textTransform: 'uppercase' }}>
@@ -258,7 +281,7 @@ export function LandingPage() {
       </section>
 
       {/* SECTION 3 — TRUST / CAPABILITY STRIP */}
-      <section style={{ padding: '36px 24px', background: '#070C0A', borderBottom: '1px solid #1E2822' }}>
+      <section style={{ padding: '36px 24px', background: 'rgba(7, 12, 10, 0.65)', backdropFilter: 'blur(8px)', borderBottom: '1px solid rgba(48, 56, 51, 0.5)' }}>
         <div style={{ maxWidth: 1320, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 24 }}>
           {/* Vendors */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
@@ -287,7 +310,7 @@ export function LandingPage() {
       </section>
 
       {/* SECTION 4 — THE PROBLEM */}
-      <section style={{ padding: '80px 24px', background: '#050914' }} id="problem">
+      <section style={{ padding: '80px 24px', background: 'rgba(5, 9, 20, 0.6)', backdropFilter: 'blur(8px)' }} id="problem">
         <div style={{ maxWidth: 1320, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', maxWidth: 840, margin: '0 auto 50px' }}>
             <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', color: '#FF7417', textTransform: 'uppercase', marginBottom: 8 }}>
@@ -354,7 +377,7 @@ export function LandingPage() {
       </section>
 
       {/* SECTION 5 — THE CIPHER-X APPROACH */}
-      <section style={{ padding: '80px 24px', background: '#090E17', borderTop: '1px solid #1E2822' }}>
+      <section style={{ padding: '80px 24px', background: 'rgba(9, 14, 23, 0.65)', backdropFilter: 'blur(8px)', borderTop: '1px solid rgba(48, 56, 51, 0.5)' }}>
         <div style={{ maxWidth: 1320, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', maxWidth: 840, margin: '0 auto 40px' }}>
             <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', color: '#25B981', textTransform: 'uppercase', marginBottom: 8 }}>
@@ -432,7 +455,7 @@ export function LandingPage() {
       </section>
 
       {/* SECTION 6 — KEY FEATURES */}
-      <section style={{ padding: '90px 24px', background: '#050914' }} id="features">
+      <section style={{ padding: '90px 24px', background: 'rgba(5, 9, 20, 0.6)', backdropFilter: 'blur(8px)' }} id="features">
         <div style={{ maxWidth: 1320, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', maxWidth: 840, margin: '0 auto 60px' }}>
             <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', color: '#FF7417', textTransform: 'uppercase', marginBottom: 8 }}>
@@ -520,7 +543,7 @@ export function LandingPage() {
       </section>
 
       {/* SECTION 8 — AI + DETERMINISTIC ENGINE SPLIT */}
-      <section style={{ padding: '80px 24px', background: '#070C0A', borderTop: '1px solid #1E2822' }}>
+      <section style={{ padding: '80px 24px', background: 'rgba(7, 12, 10, 0.65)', backdropFilter: 'blur(8px)', borderTop: '1px solid rgba(48, 56, 51, 0.5)' }}>
         <div style={{ maxWidth: 1320, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', maxWidth: 840, margin: '0 auto 50px' }}>
             <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', color: '#FF7417', textTransform: 'uppercase', marginBottom: 8 }}>
@@ -592,7 +615,7 @@ export function LandingPage() {
       </section>
 
       {/* SECTION 9 — COMPLIANCE FRAMEWORKS */}
-      <section style={{ padding: '80px 24px', background: '#050914' }} id="compliance">
+      <section style={{ padding: '80px 24px', background: 'rgba(5, 9, 20, 0.6)', backdropFilter: 'blur(8px)' }} id="compliance">
         <div style={{ maxWidth: 1320, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', maxWidth: 840, margin: '0 auto 50px' }}>
             <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', color: '#FF7417', textTransform: 'uppercase', marginBottom: 8 }}>
@@ -646,7 +669,7 @@ export function LandingPage() {
       </section>
 
       {/* SECTION 10 — MULTI-VENDOR TRANSLATION */}
-      <section style={{ padding: '80px 24px', background: '#090E17', borderTop: '1px solid #1E2822' }} id="vendors">
+      <section style={{ padding: '80px 24px', background: 'rgba(9, 14, 23, 0.65)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', borderTop: '1px solid rgba(48, 56, 51, 0.5)' }} id="vendors">
         <div style={{ maxWidth: 1320, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', maxWidth: 840, margin: '0 auto 40px' }}>
             <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', color: '#25B981', textTransform: 'uppercase', marginBottom: 8 }}>
@@ -713,7 +736,7 @@ export function LandingPage() {
       </section>
 
       {/* SECTION 12 — WHAT-IF PREVIEW */}
-      <section style={{ padding: '80px 24px', background: '#050914' }} id="simulation">
+      <section style={{ padding: '80px 24px', background: 'rgba(5, 9, 20, 0.60)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', borderTop: '1px solid rgba(48, 56, 51, 0.5)' }} id="simulation">
         <div style={{ maxWidth: 1320, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', maxWidth: 840, margin: '0 auto 40px' }}>
             <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', color: '#FF7417', textTransform: 'uppercase', marginBottom: 8 }}>
@@ -813,9 +836,11 @@ export function LandingPage() {
       <section
         style={{
           padding: '100px 24px',
-          background: 'radial-gradient(ellipse 60% 60% at 50% 50%, rgba(255, 116, 23, 0.15) 0%, rgba(5, 9, 20, 0) 100%)',
+          background: 'radial-gradient(ellipse 60% 60% at 50% 50%, rgba(255, 116, 23, 0.15) 0%, rgba(5, 9, 20, 0.5) 100%)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
           textAlign: 'center',
-          borderTop: '1px solid #1E2822',
+          borderTop: '1px solid rgba(48, 56, 51, 0.5)',
         }}
       >
         <div style={{ maxWidth: 880, margin: '0 auto' }}>
@@ -868,6 +893,7 @@ export function LandingPage() {
 
       {/* Footer */}
       <PublicFooter />
+      </div>
     </div>
   );
 }
