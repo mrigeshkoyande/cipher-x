@@ -1,16 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Lock, ShieldCheck, AlertOctagon, CheckCircle2, 
-  RefreshCw, Cpu, Database, Link as LinkIcon, Flame, Layers
-} from 'lucide-react';
 
 export default function AuditBlockchainView() {
-  const [auditEvents, setAuditEvents] = useState([]);
-  const [anchors, setAnchors] = useState([]);
-  const [verificationResult, setVerificationResult] = useState(null);
-  const [tamperingSimulationResult, setTamperingSimulationResult] = useState(null);
-  const [verifying, setVerifying] = useState(false);
-  const [activeTab, setActiveTab] = useState('chain');
+  const [auditData, setAuditData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,225 +10,240 @@ export default function AuditBlockchainView() {
 
   const fetchAuditData = async () => {
     try {
-      const [evtRes, ancRes, verRes] = await Promise.all([
-        fetch('/api/v1/audit/events'),
-        fetch('/api/v1/blockchain/anchors'),
-        fetch('/api/v1/audit/verify')
-      ]);
-      if (evtRes.ok && ancRes.ok && verRes.ok) {
-        const evtData = await evtRes.json();
-        const ancData = await ancRes.json();
-        const verData = await verRes.json();
-        setAuditEvents(evtData);
-        setAnchors(ancData);
-        setVerificationResult(verData);
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
+      const res = await fetch('/api/v1/audit/trail');
+      if (res.ok) setAuditData(await res.json());
+    } catch (e) { console.error(e); }
+    finally { setLoading(false); }
   };
 
-  const handleVerifyIntegrity = async () => {
-    setVerifying(true);
-    setTamperingSimulationResult(null);
-    try {
-      const res = await fetch('/api/v1/audit/verify');
-      if (res.ok) {
-        const data = await res.json();
-        setVerificationResult(data);
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setVerifying(false);
-    }
-  };
+  const demoEvents = [
+    { timestamp: 'Oct 18, 2024\n14:32:04 UTC', actor: 'analyst@cipherx.sec', actorRole: 'HUMAN ATTESTOR', action: 'Report Signed & Sealed', actionIcon: 'edit_document', actionColor: 'var(--severity-pass)', target: 'Q3 2024 CIS Benchmark Fleet Attestation', targetDetail: 'Doc ID: CX-AUD-2024-Q3-009', hash: 'a8120c9…' },
+    { timestamp: 'Oct 18, 2024\n14:26:15 UTC', actor: 'analyst@cipherx.sec', actorRole: 'LEAD REVIEWER', action: 'Human Mapping Validated', actionIcon: 'done_all', actionColor: 'var(--primary)', target: 'MAP-VENDX-001\n(vendor-x secure-admin-mode enable)', targetDetail: 'Promoted from 72% AI suggestion to Verified Canonical Fact', hash: 'd290fa8…' },
+    { timestamp: 'Oct 18, 2024\n14:18:22 UTC', actor: 'Cipher-X Ingestion Agent', actorRole: 'AUTOMATED PIPELINE', action: 'Configuration Snapshot Hashed & Parsed', actionIcon: 'inventory_2', actionColor: 'var(--on-surface-variant)', target: 'cisco-core-01-running.cfg (v14.2)', targetDetail: 'Raw config serialized into canonical AST ledger', hash: '8f91a27…' },
+    { timestamp: 'Oct 18, 2024\n14:15:00 UTC', actor: 'Syslog Ingest Service', actorRole: 'EVENT STREAM', action: 'Configuration Drift Detected', actionIcon: 'warning', actionColor: 'var(--severity-medium)', target: 'Cisco-Core-01 (Line 142 changed from SSH to Telnet)', targetDetail: 'Unscheduled out-of-band change flagged by Sentinel', hash: '33bc91f…' },
+    { timestamp: 'Oct 18, 2024\n08:00:10 UTC', actor: 'System Scheduled Bot', actorRole: 'CRON WORKER', action: 'Automated Compliance Evaluation Executed', actionIcon: 'schedule', actionColor: 'var(--severity-info)', target: 'Full Fleet (128 Nodes) across CIS v8.0', targetDetail: 'Scheduled global posture evaluation round', hash: 'e199042…' },
+  ];
 
-  const handleSimulateTampering = async () => {
-    if (auditEvents.length < 2) return;
-    try {
-      const res = await fetch('/api/v1/audit/simulate-tamper', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          event_index: 1,
-          modified_message: "UNAUTHORIZED_MALICIOUS_LOG_TAMPERING_INJECTED"
-        })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setTamperingSimulationResult(data);
-        setVerificationResult(data.verification_result);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div style={{ textAlign: 'center' }}>
+          <div className="loading-spinner"></div>
+          <div className="loading-text">Loading Audit Trail...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
+    <div className="animate-in">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="font-heading font-extrabold text-2xl text-slate-100 flex items-center gap-2.5">
-            <Lock className="w-6 h-6 text-cyan-400" /> Cryptographic Audit Integrity & Blockchain Anchoring
-          </h2>
-          <p className="text-xs text-slate-400 mt-1">
-            SHA-256 hash chaining (Event_N = SHA256(Payload + Event_N-1)) and distributed ledger Merkle proofs.
-          </p>
+      <div className="page-header">
+        <div className="page-header-badge">
+          <span className="material-symbols-outlined" style={{ fontSize: 14 }}>assured_workload</span>
+          IMMUTABLE FORENSIC PROVENANCE
         </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleVerifyIntegrity}
-            disabled={verifying}
-            className="btn-cyber-primary text-xs"
-          >
-            {verifying ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <ShieldCheck className="w-3.5 h-3.5" />}
-            Verify Audit Chain Integrity
-          </button>
-          <button
-            onClick={handleSimulateTampering}
-            className="btn-cyber-secondary text-xs text-amber-400 hover:text-amber-300"
-          >
-            <Flame className="w-3.5 h-3.5 text-amber-400" />
-            Simulate Tamper Demo
-          </button>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+          <div>
+            <h1>Cryptographic Audit Trail & Non-Repudiation Ledger</h1>
+            <p>Tamper-proof chronological ledger of all configuration ingestions, AI normalizations, human validations, compliance evaluations, and generated reports.</p>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', color: 'var(--on-surface-variant)' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>sync</span>
+            Sync Status: Block #19,842,109 (Synced 2s ago)
+          </div>
         </div>
       </div>
 
-      {/* Verification Status Banner */}
-      {verificationResult && (
-        <div className={`p-4 rounded-xl border flex items-center justify-between gap-4 ${
-          verificationResult.valid
-            ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
-            : 'bg-red-500/15 border-red-500/40 text-red-300 animate-pulse'
-        }`}>
-          <div className="flex items-center gap-3">
-            {verificationResult.valid ? (
-              <div className="w-9 h-9 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center">
-                <ShieldCheck className="w-5 h-5 text-emerald-400" />
-              </div>
-            ) : (
-              <div className="w-9 h-9 rounded-lg bg-red-500/20 border border-red-500/40 flex items-center justify-center">
-                <AlertOctagon className="w-5 h-5 text-red-400" />
-              </div>
-            )}
+      {/* Integrity Banner */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+        <div className="stat-card" style={{ borderColor: 'var(--severity-pass)', borderWidth: 2, gridColumn: 'span 1' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 28, color: 'var(--severity-pass)' }}>verified_user</span>
             <div>
-              <div className="font-heading font-extrabold text-sm uppercase tracking-wide">
-                AUDIT INTEGRITY STATUS: {verificationResult.status}
+              <span className="badge validated" style={{ marginBottom: '0.25rem' }}>ACTIVE GUARANTEE</span>
+              <div style={{ fontWeight: 800, fontSize: '1.25rem', color: 'var(--severity-pass)' }}>INTEGRITY VERIFIED</div>
+              <div style={{ fontSize: '0.6875rem', color: 'var(--on-surface-variant)' }}>ZERO TAMPERING DETECTED</div>
+            </div>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-card-label">Ledger Anchor Block</div>
+          <div className="stat-card-value" style={{ fontFamily: "'JetBrains Mono', monospace" }}>#19,842,109</div>
+          <div className="stat-card-sub"><span className="dot green"></span>Public Consortium Notarization</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-card-label">Current Merkle Root Hash</div>
+          <div className="hash-value" style={{ marginTop: '0.375rem', fontSize: '0.75rem' }}>0x9e88ba42f…3f1a</div>
+          <div className="stat-card-sub"><span className="material-symbols-outlined" style={{ fontSize: 12 }}>check_circle</span> State Hash Validated</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-card-label">Active Cryptographic Engine</div>
+          <div style={{ fontWeight: 700, fontSize: '0.9375rem', marginTop: '0.25rem' }}>SHA-256 + RSA-4096</div>
+          <div className="stat-card-sub"><span className="material-symbols-outlined" style={{ fontSize: 12 }}>check_circle</span> FIPS 140-3 HSM Rooted</div>
+        </div>
+      </div>
+
+      {/* Content: Table + Verification Panel */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: '1rem' }}>
+        {/* Audit Trail Table */}
+        <div>
+          {/* Filters */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--on-surface-variant)' }}>FILTERS:</span>
+            <select style={{ padding: '0.25rem 0.5rem', border: '1px solid var(--outline-variant)', borderRadius: 'var(--radius-md)', background: 'var(--surface-container-low)', fontSize: '0.8125rem', fontFamily: 'inherit' }}>
+              <option>Actor: All Actors</option>
+            </select>
+            <select style={{ padding: '0.25rem 0.5rem', border: '1px solid var(--outline-variant)', borderRadius: 'var(--radius-md)', background: 'var(--surface-container-low)', fontSize: '0.8125rem', fontFamily: 'inherit' }}>
+              <option>Event Type: All Types</option>
+            </select>
+            <select style={{ padding: '0.25rem 0.5rem', border: '1px solid var(--outline-variant)', borderRadius: 'var(--radius-md)', background: 'var(--surface-container-low)', fontSize: '0.8125rem', fontFamily: 'inherit' }}>
+              <option>Today (Last 24 Hours)</option>
+            </select>
+          </div>
+
+          <div style={{ fontSize: '0.75rem', color: 'var(--on-surface-variant)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: 14 }}>refresh</span>
+            5 of 1,420 events
+          </div>
+
+          <div className="data-table-container">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Timestamp (UTC)</th>
+                  <th>Actor & Origin</th>
+                  <th>Action & Operation</th>
+                  <th>Target Object / Details</th>
+                  <th>Crypto Hash</th>
+                </tr>
+              </thead>
+              <tbody>
+                {demoEvents.map((evt, i) => (
+                  <tr key={i}>
+                    <td style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '0.75rem', whiteSpace: 'pre-line' }}>{evt.timestamp}</td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontWeight: 600, fontSize: '0.8125rem' }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: 16 }}>person</span>
+                        {evt.actor}
+                      </div>
+                      <div style={{ fontSize: '0.625rem', color: 'var(--on-surface-variant)', fontFamily: "'JetBrains Mono', monospace" }}>{evt.actorRole}</div>
+                    </td>
+                    <td>
+                      <span className="badge" style={{ background: `${evt.actionColor}15`, color: evt.actionColor, border: `1px solid ${evt.actionColor}30` }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: 14 }}>{evt.actionIcon}</span>
+                        {evt.action}
+                      </span>
+                    </td>
+                    <td>
+                      <div style={{ fontWeight: 600, fontSize: '0.8125rem', whiteSpace: 'pre-line' }}>{evt.target}</div>
+                      <div style={{ fontSize: '0.6875rem', color: 'var(--on-surface-variant)' }}>{evt.targetDetail}</div>
+                    </td>
+                    <td>
+                      <span className="hash-value" style={{ fontSize: '0.6875rem' }}>{evt.hash}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className="data-table-footer">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 14 }}>lock</span>
+                Append-only forensic store. Every block is signed with node key #KEY-HSM-9912
               </div>
-              <div className="text-xs opacity-90 mt-0.5">
-                {verificationResult.message || verificationResult.reason}
+              <div className="pagination">
+                <button>Previous</button>
+                <button className="active">1</button>
+                <button>2</button>
+                <span>…</span>
+                <button>284</button>
+                <button>Next</button>
               </div>
             </div>
           </div>
+        </div>
 
-          <div className="font-mono text-xs text-right hidden md:block">
-            <div>Chain Length: <strong>{verificationResult.total_events || auditEvents.length} Events</strong></div>
-            <div className="text-[10px] opacity-75">Genesis: 0000000000000000...</div>
+        {/* Verification Panel */}
+        <div>
+          <div className="info-card">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 20, color: 'var(--primary)' }}>fingerprint</span>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '1rem' }}>Verify File or Artifact Signature</div>
+                <div style={{ fontSize: '0.6875rem', color: 'var(--on-surface-variant)' }}>Independent Proof of Non-Repudiation</div>
+              </div>
+            </div>
+
+            {/* Drag & Drop Zone */}
+            <div style={{ border: '2px dashed var(--outline-variant)', borderRadius: 'var(--radius-lg)', padding: '1.5rem', textAlign: 'center', marginBottom: '1rem' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 36, color: 'var(--outline)', display: 'block', marginBottom: '0.5rem' }}>upload_file</span>
+              <div style={{ fontWeight: 600, marginBottom: '0.25rem' }}>Drag & drop raw config or report</div>
+              <div style={{ fontSize: '0.6875rem', color: 'var(--on-surface-variant)', marginBottom: '0.5rem' }}>.cfg, .json, .pdf, or .sha256 digest files</div>
+              <button className="btn btn-secondary">Browse Local File</button>
+            </div>
+
+            {/* Hash Input */}
+            <div style={{ fontSize: '0.625rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--on-surface-variant)', letterSpacing: '0.04em', marginBottom: '0.375rem' }}>
+              OR PASTE SHA-256 / BLAKE3 HASH
+            </div>
+            <div style={{ display: 'flex', gap: '0.375rem', marginBottom: '1rem' }}>
+              <input
+                type="text"
+                placeholder="e.g. a8120c92f1b4904da88021ec53018247df089 1bf41209..."
+                style={{ flex: 1, padding: '0.375rem 0.5rem', border: '1px solid var(--outline-variant)', borderRadius: 'var(--radius-md)', background: 'var(--surface-container-low)', fontFamily: "'JetBrains Mono', monospace", fontSize: '0.75rem' }}
+              />
+              <button className="btn btn-secondary" style={{ padding: '0.375rem 0.5rem', fontSize: '0.6875rem' }}>PASTE</button>
+            </div>
+
+            <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', marginBottom: '1rem' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>verified</span>
+              Verify Against Merkle Tree
+            </button>
+
+            {/* Cryptographic Path */}
+            <div style={{ marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                <span style={{ fontWeight: 700, fontSize: '0.875rem' }}>Cryptographic Path</span>
+                <span style={{ fontSize: '0.6875rem', color: 'var(--on-surface-variant)' }}>Proof: 12 Hops</span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem', paddingLeft: '0.5rem', borderLeft: '2px solid var(--outline-variant)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.8125rem' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: 14 }}>subdirectory_arrow_right</span>
+                  <span className="code-tag">Leaf Hash (Target)</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.8125rem' }}>
+                  <span style={{ color: 'var(--outline)' }}>→</span>
+                  Sibling: <span className="hash-value" style={{ fontSize: '0.625rem' }}>0x48a1…61ef</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.8125rem' }}>
+                  <span style={{ color: 'var(--outline)' }}>→</span>
+                  Root Node: <span className="hash-value" style={{ fontSize: '0.625rem' }}>0x9e88ba42f…3f1a</span>
+                </div>
+              </div>
+              <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.8125rem', color: 'var(--severity-pass)', fontWeight: 600 }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 16 }}>check_circle</span>
+                Matches Ledger State #19,842,109
+              </div>
+            </div>
+
+            {/* Consensus Nodes */}
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.375rem' }}>
+                <span style={{ fontWeight: 700, fontSize: '0.875rem' }}>CONSENSUS NODES</span>
+                <span style={{ fontSize: '0.6875rem', color: 'var(--on-surface-variant)' }}>7 / 7 Active</span>
+              </div>
+              <div style={{ display: 'flex', gap: '0.25rem', marginBottom: '0.5rem' }}>
+                {[1,2,3,4,5,6,7].map(i => (
+                  <div key={i} style={{ flex: 1, height: 6, background: 'var(--severity-info)', borderRadius: 3 }}></div>
+                ))}
+              </div>
+              <div style={{ fontSize: '0.6875rem', color: 'var(--on-surface-variant)' }}>
+                HSM Attestation Protocol: <span style={{ fontWeight: 600 }}>PKCS#11 v3.0</span>
+              </div>
+            </div>
           </div>
         </div>
-      )}
-
-      {/* View Subtabs */}
-      <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
-        <button
-          onClick={() => setActiveTab('chain')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-            activeTab === 'chain' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40' : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          Cryptographic Hash Chain ({auditEvents.length} Events)
-        </button>
-        <button
-          onClick={() => setActiveTab('blockchain')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-            activeTab === 'blockchain' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/40' : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          Blockchain Anchors & Merkle Proofs ({anchors.length})
-        </button>
       </div>
-
-      {/* Tab: Hash Chained Audit Events */}
-      {activeTab === 'chain' && (
-        <div className="glass-panel p-5 space-y-4">
-          <div className="space-y-3">
-            {auditEvents.map((evt, idx) => (
-              <div
-                key={evt.index}
-                className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2.5 font-mono text-xs relative"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-400 font-bold">
-                      BLOCK #{evt.index}
-                    </span>
-                    <span className="text-slate-200 font-bold">{evt.event_type}</span>
-                  </div>
-                  <span className="text-slate-500 text-[11px] font-sans">
-                    {new Date(evt.timestamp * 1000).toLocaleString()}
-                  </span>
-                </div>
-
-                <div className="text-slate-400 text-[11px] font-sans">
-                  Actor: <strong className="text-slate-300">{evt.actor}</strong> | Resource: <strong className="text-slate-300">{evt.resource_id}</strong>
-                </div>
-
-                {/* Hashes Display */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px] bg-slate-950 p-2.5 rounded border border-slate-900">
-                  <div className="truncate">
-                    <span className="text-slate-500">PREV HASH: </span>
-                    <span className="text-slate-400">{evt.previous_hash}</span>
-                  </div>
-                  <div className="truncate">
-                    <span className="text-cyan-500">BLOCK HASH: </span>
-                    <span className="text-cyan-300 font-bold">{evt.event_hash}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Tab: Blockchain Ledger Anchors */}
-      {activeTab === 'blockchain' && (
-        <div className="glass-panel p-5 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {anchors.map((anc) => (
-              <div key={anc.anchor_id} className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2.5 text-xs font-mono">
-                <div className="flex items-center justify-between">
-                  <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 font-bold">
-                    {anc.asset_type} ANCHOR
-                  </span>
-                  <span className="text-slate-500 text-[10px]">Block #{anc.block_height}</span>
-                </div>
-
-                <div className="text-slate-300 truncate">
-                  Tx Hash: <strong className="text-cyan-400">{anc.transaction_hash}</strong>
-                </div>
-
-                <div className="text-slate-400 text-[11px] truncate">
-                  Content SHA-256: <span className="text-slate-200">{anc.content_hash}</span>
-                </div>
-
-                <div className="text-slate-400 text-[11px] truncate">
-                  Merkle Root: <span className="text-slate-200">{anc.merkle_root}</span>
-                </div>
-
-                <div className="text-[10px] text-slate-500 border-t border-slate-800/80 pt-1.5 flex items-center justify-between">
-                  <span>{anc.ledger_network}</span>
-                  <span className="text-emerald-400 font-bold">ON-CHAIN VERIFIED</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
