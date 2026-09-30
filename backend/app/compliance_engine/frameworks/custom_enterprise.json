@@ -1,0 +1,34 @@
+{
+  "id": "CUSTOM-ENT",
+  "name": "Cipher-X Zero-Trust Enterprise Policy",
+  "version": "v3.2",
+  "description": "Internal enterprise zero-trust baseline and regulatory hardening baseline.",
+  "authority": "Enterprise Information Security Architecture Board",
+  "categories": [
+    "Zero-Trust Architecture",
+    "Perimeter Defenses",
+    "Identity & Cryptographic Baseline"
+  ],
+  "control_mappings": {
+    "ZT-NET-01": "CTRL-SSH-01",
+    "ZT-NET-02": "CTRL-TELNET-01",
+    "ZT-NET-03": "CTRL-HTTP-01",
+    "ZT-NET-04": "CTRL-HTTPS-01",
+    "ZT-NET-05": "CTRL-SNMP-01",
+    "ZT-NET-06": "CTRL-LOG-01",
+    "ZT-NET-07": "CTRL-NTP-01",
+    "ZT-NET-08": "CTRL-AAA-01",
+    "ZT-NET-09": "CTRL-PASS-01",
+    "ZT-NET-10": "CTRL-TIMEOUT-01",
+    "ZT-NET-11": "CTRL-CRYPTO-01",
+    "ZT-NET-12": "CTRL-UNUSED-01",
+    "ZT-NET-13": "CTRL-MGMT-01",
+    "ZT-NET-14": "CTRL-ACL-01",
+    "ZT-NET-15": "CTRL-FW-01",
+    "ZT-NET-16": "CTRL-REMOTE-01",
+    "ZT-NET-17": "CTRL-AUTH-01",
+    "ZT-NET-18": "CTRL-AUTHZ-01",
+    "ZT-NET-19": "CTRL-ROUTING-01",
+    "ZT-NET-20": "CTRL-IFSEC-01"
+  }
+}

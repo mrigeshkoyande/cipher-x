@@ -1,0 +1,34 @@
+{
+  "id": "DISA-STIG",
+  "name": "DoD DISA Network Infrastructure STIG",
+  "version": "v10.1",
+  "description": "Defense Information Systems Agency Security Technical Implementation Guide for Network Infrastructure Devices.",
+  "authority": "United States Department of Defense",
+  "categories": [
+    "CAT I - High Vulnerability",
+    "CAT II - Medium Vulnerability",
+    "CAT III - Low Vulnerability"
+  ],
+  "control_mappings": {
+    "STIG-NET-000010": "CTRL-SSH-01",
+    "STIG-NET-000020": "CTRL-TELNET-01",
+    "STIG-NET-000030": "CTRL-HTTP-01",
+    "STIG-NET-000040": "CTRL-HTTPS-01",
+    "STIG-NET-000050": "CTRL-SNMP-01",
+    "STIG-NET-000060": "CTRL-LOG-01",
+    "STIG-NET-000070": "CTRL-NTP-01",
+    "STIG-NET-000080": "CTRL-AAA-01",
+    "STIG-NET-000090": "CTRL-PASS-01",
+    "STIG-NET-000100": "CTRL-TIMEOUT-01",
+    "STIG-NET-000110": "CTRL-CRYPTO-01",
+    "STIG-NET-000120": "CTRL-UNUSED-01",
+    "STIG-NET-000130": "CTRL-MGMT-01",
+    "STIG-NET-000140": "CTRL-ACL-01",
+    "STIG-NET-000150": "CTRL-FW-01",
+    "STIG-NET-000160": "CTRL-REMOTE-01",
+    "STIG-NET-000170": "CTRL-AUTH-01",
+    "STIG-NET-000180": "CTRL-AUTHZ-01",
+    "STIG-NET-000190": "CTRL-ROUTING-01",
+    "STIG-NET-000200": "CTRL-IFSEC-01"
+  }
+}
