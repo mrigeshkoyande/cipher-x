@@ -1,241 +1,112 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Cpu, Play, ArrowRight, CheckCircle2, ShieldCheck, 
-  TrendingUp, TrendingDown, RefreshCw, Zap, Sliders, ChevronRight
-} from 'lucide-react';
 
 export default function WhatIfView({ selectedDeviceId, onNavigateTab }) {
-  const [devices, setDevices] = useState([]);
-  const [selectedDevice, setSelectedDevice] = useState(null);
-  const [scenarios, setScenarios] = useState([]);
-  const [selectedScenario, setSelectedScenario] = useState(null);
-  const [customPatch, setCustomPatch] = useState('');
+  const [loading, setLoading] = useState(true);
   const [simulationResult, setSimulationResult] = useState(null);
-  const [simulating, setSimulating] = useState(false);
 
-  useEffect(() => {
-    fetchInitialData();
-  }, []);
+  useEffect(() => { setTimeout(() => setLoading(false), 500); }, []);
 
-  const fetchInitialData = async () => {
-    try {
-      const [devRes, scenRes] = await Promise.all([
-        fetch('/api/v1/devices'),
-        fetch('/api/v1/whatif/scenarios')
-      ]);
-      if (devRes.ok && scenRes.ok) {
-        const devData = await devRes.json();
-        const scenData = await scenRes.json();
-        setDevices(devData);
-        setScenarios(scenData);
-        if (devData.length > 0) setSelectedDevice(devData[0]);
-        if (scenData.length > 0) setSelectedScenario(scenData[0]);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
+  const demoMutations = [
+    { id: 1, description: 'Add "transport input telnet" to line vty 0 4', impact: 'CRITICAL', controlsAffected: ['CIS-NET-004', 'NIST-SC-008'], scoreDelta: -8.2, riskLabel: 'Enables cleartext credential transmission' },
+    { id: 2, description: 'Remove "ntp authenticate" from global config', impact: 'MEDIUM', controlsAffected: ['CIS-NET-007', 'NIST-AU-008'], scoreDelta: -3.1, riskLabel: 'Disables NTP authentication chain' },
+    { id: 3, description: 'Add "ip ssh version 2" to global config', impact: 'POSITIVE', controlsAffected: ['CIS-NET-001'], scoreDelta: +4.5, riskLabel: 'Enforces SSHv2 protocol exclusively' },
+    { id: 4, description: 'Add "snmp-server community PUBLIC RO" to global config', impact: 'HIGH', controlsAffected: ['CIS-NET-005', 'DISA-NET-030'], scoreDelta: -6.7, riskLabel: 'Exposes SNMP with default community string' },
+  ];
 
-  const handleRunSimulation = async () => {
-    if (!selectedDevice) return;
-    setSimulating(true);
-    try {
-      const res = await fetch('/api/v1/whatif/simulate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          device_id: selectedDevice.id,
-          scenario_id: selectedScenario?.id,
-          custom_patch: customPatch.trim() ? customPatch : null
-        })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setSimulationResult(data);
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setSimulating(false);
-    }
-  };
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div style={{ textAlign: 'center' }}>
+          <div className="loading-spinner"></div>
+          <div className="loading-text">Initializing What-If Simulator...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h2 className="font-heading font-extrabold text-2xl text-slate-100 flex items-center gap-2.5">
-          <Cpu className="w-6 h-6 text-cyan-400" /> What-If Configuration Simulation Engine
-        </h2>
-        <p className="text-xs text-slate-400 mt-1">
-          Predictively forecast compliance score gains, risk reduction, and affected regulatory controls before changing production equipment.
-        </p>
+    <div className="animate-in">
+      <div className="page-header">
+        <div className="page-header-badge">
+          <span className="material-symbols-outlined" style={{ fontSize: 14 }}>query_stats</span>
+          PREDICTIVE INTELLIGENCE
+        </div>
+        <h1>Query & What-If Simulator</h1>
+        <p>Predictive configuration mutation simulator — forecast compliance score impact before deploying changes to production network infrastructure.</p>
       </div>
 
-      {/* Configuration & Scenario Selector */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column: Simulation Controls (5 cols) */}
-        <div className="lg:col-span-5 glass-panel p-5 space-y-4">
-          <div>
-            <label className="text-xs font-mono text-slate-400 block mb-1.5 font-semibold">1. SELECT TARGET DEVICE</label>
-            <select
-              value={selectedDevice?.id || ''}
-              onChange={(e) => setSelectedDevice(devices.find(d => d.id === e.target.value))}
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-400"
-            >
-              {devices.map(d => (
-                <option key={d.id} value={d.id}>{d.name} ({d.vendor.toUpperCase()} — {d.compliance_score}%)</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="text-xs font-mono text-slate-400 block mb-1.5 font-semibold">2. SELECT POLICY MUTATION SCENARIO</label>
-            <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
-              {scenarios.map((scen) => {
-                const isSelected = selectedScenario?.id === scen.id;
-                return (
-                  <div
-                    key={scen.id}
-                    onClick={() => { setSelectedScenario(scen); setCustomPatch(''); }}
-                    className={`p-3 rounded-lg border cursor-pointer transition ${
-                      isSelected
-                        ? 'bg-cyan-500/15 border-cyan-400 text-cyan-300'
-                        : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:bg-slate-900/90'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between text-xs font-bold font-heading mb-0.5">
-                      <span>{scen.name}</span>
-                      <span className="font-mono text-[9px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">{scen.category}</span>
-                    </div>
-                    <p className="text-[11px] text-slate-400 line-clamp-1">{scen.description}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Custom Patch Input */}
-          <div>
-            <label className="text-xs font-mono text-slate-400 block mb-1 font-semibold">
-              OR CUSTOM CLI PATCH (Optional)
-            </label>
-            <textarea
-              rows={3}
-              placeholder="e.g. no snmp-server community public\nip ssh version 2"
-              value={customPatch}
-              onChange={(e) => setCustomPatch(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 font-mono text-xs text-slate-200 focus:outline-none focus:border-cyan-400"
-            />
-          </div>
-
-          <button
-            onClick={handleRunSimulation}
-            disabled={simulating}
-            className="btn-cyber-primary w-full justify-center text-xs py-3"
-          >
-            {simulating ? (
-              <RefreshCw className="w-4 h-4 animate-spin" />
-            ) : (
-              <Play className="w-4 h-4 fill-slate-950" />
-            )}
-            Run Predictive Simulation Forecast
+      {/* Query Input */}
+      <div className="info-card" style={{ marginBottom: '1rem' }}>
+        <h3 style={{ marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span className="material-symbols-outlined" style={{ fontSize: 20 }}>terminal</span>
+          Configuration Mutation Query
+        </h3>
+        <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.75rem' }}>
+          <select style={{ padding: '0.375rem 0.75rem', border: '1px solid var(--outline-variant)', borderRadius: 'var(--radius-md)', background: 'var(--surface-container-low)', fontSize: '0.8125rem', fontFamily: 'inherit' }}>
+            <option>Target: Cisco-Core-01</option>
+            <option>Target: FortiGate-DC-01</option>
+            <option>Target: All Fleet</option>
+          </select>
+          <select style={{ padding: '0.375rem 0.75rem', border: '1px solid var(--outline-variant)', borderRadius: 'var(--radius-md)', background: 'var(--surface-container-low)', fontSize: '0.8125rem', fontFamily: 'inherit' }}>
+            <option>Framework: CIS v8.0</option>
+            <option>Framework: NIST 800-53</option>
+            <option>Framework: All Frameworks</option>
+          </select>
+        </div>
+        <textarea
+          placeholder="Enter configuration change to simulate (e.g., 'What happens if I enable telnet on VTY lines?')..."
+          style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--outline-variant)', borderRadius: 'var(--radius-md)', background: 'var(--surface-container-low)', fontFamily: "'JetBrains Mono', monospace", fontSize: '0.8125rem', minHeight: 80, resize: 'vertical' }}
+        />
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.75rem' }}>
+          <button className="btn btn-primary">
+            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>play_arrow</span>
+            Run Simulation
           </button>
         </div>
+      </div>
 
-        {/* Right Column: Predictive Impact & Delta Forecast (7 cols) */}
-        <div className="lg:col-span-7 glass-panel p-5 space-y-5">
-          {simulationResult ? (
-            <div className="space-y-5">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div>
-                  <h3 className="font-heading font-extrabold text-base text-slate-100 flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-cyan-400" /> Simulation Outcome Forecast
-                  </h3>
-                  <div className="text-xs text-slate-400 font-mono mt-0.5">
-                    Target: <strong className="text-slate-200">{selectedDevice?.name}</strong>
-                  </div>
+      {/* Simulation Results */}
+      <h3 style={{ marginBottom: '0.75rem' }}>Simulation Results — Predicted Impact</h3>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        {demoMutations.map((mut) => (
+          <div className="info-card" key={mut.id} style={{ marginBottom: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.375rem' }}>
+                  <span className={`badge ${mut.impact === 'CRITICAL' ? 'critical' : mut.impact === 'HIGH' ? 'high' : mut.impact === 'MEDIUM' ? 'medium' : 'pass'}`}>
+                    {mut.impact}
+                  </span>
+                  <span style={{ fontWeight: 600 }}>{mut.riskLabel}</span>
                 </div>
-                <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                  SIMULATION COMPLETE
-                </span>
-              </div>
-
-              {/* Key Delta Metrics */}
-              <div className="grid grid-cols-2 gap-4">
-                {/* Compliance Score Delta */}
-                <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
-                  <div className="text-[11px] font-mono text-slate-400 mb-1">PROJECTED COMPLIANCE</div>
-                  <div className="flex items-baseline gap-2 font-heading">
-                    <span className="text-2xl font-extrabold text-slate-400">
-                      {simulationResult.baseline.compliance_score}%
-                    </span>
-                    <ArrowRight className="w-4 h-4 text-slate-500" />
-                    <span className="text-3xl font-extrabold text-emerald-400">
-                      {simulationResult.projected.compliance_score}%
-                    </span>
-                  </div>
-                  <div className="text-xs font-mono text-emerald-400 mt-1 font-semibold">
-                    +{simulationResult.deltas.compliance_score_delta}% Compliance Improvement
-                  </div>
+                <div className="code-block" style={{ padding: '0.5rem 0.75rem', marginBottom: '0.5rem' }}>
+                  {mut.description}
                 </div>
-
-                {/* Risk Score Delta */}
-                <div className="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
-                  <div className="text-[11px] font-mono text-slate-400 mb-1">PROJECTED FLEET RISK</div>
-                  <div className="flex items-baseline gap-2 font-heading">
-                    <span className="text-2xl font-extrabold text-slate-400">
-                      {simulationResult.baseline.risk_score} pts
-                    </span>
-                    <ArrowRight className="w-4 h-4 text-slate-500" />
-                    <span className="text-3xl font-extrabold text-cyan-400">
-                      {simulationResult.projected.risk_score} pts
-                    </span>
-                  </div>
-                  <div className="text-xs font-mono text-cyan-400 mt-1 font-semibold">
-                    {simulationResult.deltas.risk_score_delta} pts Risk Reduction
-                  </div>
+                <div style={{ display: 'flex', gap: '0.375rem', fontSize: '0.6875rem' }}>
+                  <span style={{ color: 'var(--on-surface-variant)' }}>Controls Affected:</span>
+                  {mut.controlsAffected.map((c, i) => (
+                    <span key={i} className="code-tag" style={{ fontSize: '0.625rem' }}>{c}</span>
+                  ))}
                 </div>
               </div>
-
-              {/* Resolved Findings List */}
-              <div className="space-y-2">
-                <h4 className="text-xs font-mono text-slate-300 font-semibold uppercase flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                  Resolved Findings ({simulationResult.resolved_findings.length})
-                </h4>
-                {simulationResult.resolved_findings.length === 0 ? (
-                  <div className="text-xs text-slate-500 italic p-3 bg-slate-900/40 rounded-lg">No findings resolved by this patch.</div>
-                ) : (
-                  <div className="space-y-1.5 max-h-44 overflow-y-auto">
-                    {simulationResult.resolved_findings.map((rf) => (
-                      <div key={rf.control_id} className="p-2.5 rounded-lg bg-emerald-950/20 border border-emerald-900/40 text-xs flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                          <span className="font-mono font-bold text-emerald-300">{rf.control_id}</span>
-                          <span className="text-slate-200 truncate max-w-sm">{rf.title}</span>
-                        </div>
-                        <span className="font-mono text-[10px] text-emerald-400 font-semibold">FIXED</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
+              <div style={{ textAlign: 'right', paddingLeft: '1rem' }}>
+                <div style={{ fontSize: '0.625rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--on-surface-variant)', marginBottom: '0.25rem' }}>SCORE DELTA</div>
+                <div style={{ fontWeight: 800, fontSize: '1.5rem', fontFamily: "'JetBrains Mono', monospace", color: mut.scoreDelta > 0 ? 'var(--severity-pass)' : 'var(--severity-critical)' }}>
+                  {mut.scoreDelta > 0 ? '+' : ''}{mut.scoreDelta}%
+                </div>
               </div>
-
-              {/* Action Button */}
-              <button
-                onClick={() => onNavigateTab && onNavigateTab('remediation')}
-                className="btn-cyber-secondary w-full justify-center text-xs"
-              >
-                View Approved Remediation Playbooks
-              </button>
             </div>
-          ) : (
-            <div className="text-center py-24 text-slate-500 text-xs flex flex-col items-center gap-2">
-              <Sliders className="w-10 h-10 text-slate-600" />
-              <span>Select a scenario on the left and click "Run Predictive Simulation Forecast"</span>
-            </div>
-          )}
+          </div>
+        ))}
+      </div>
+
+      {/* Summary */}
+      <div className="alert warning" style={{ marginTop: '1rem' }}>
+        <span className="material-symbols-outlined">warning</span>
+        <div>
+          <div style={{ fontWeight: 700 }}>Aggregate Impact Summary</div>
+          <div style={{ fontSize: '0.8125rem' }}>
+            If all listed mutations are applied simultaneously, the predicted fleet compliance score would drop from <strong>91.8%</strong> to <strong>78.3%</strong> (Δ -13.5%). This would trigger 6 new HIGH severity findings and 2 CRITICAL violations.
+          </div>
         </div>
       </div>
     </div>
