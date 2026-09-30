@@ -39,7 +39,7 @@ class GraphService:
             d_node_id = f"dev_{dev.id}"
             add_node(d_node_id, dev.name, "device", status=dev.status, data={"vendor": dev.vendor, "platform": dev.platform, "score": dev.compliance_score})
 
-            latest_config = db.query(Configuration).filter(Configuration.device_id == dev.id).order_order_by(Configuration.version.desc()).first() if hasattr(Configuration.version, 'desc') else db.query(Configuration).filter(Configuration.device_id == dev.id).first()
+            latest_config = db.query(Configuration).filter(Configuration.device_id == dev.id).order_by(Configuration.version.desc()).first() if hasattr(Configuration.version, 'desc') else db.query(Configuration).filter(Configuration.device_id == dev.id).first()
             if latest_config:
                 c_node_id = f"cfg_{latest_config.id}"
                 add_node(c_node_id, f"{latest_config.filename} (v{latest_config.version})", "configuration", data={"hash": latest_config.sha256_hash[:8]})

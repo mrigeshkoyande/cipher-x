@@ -1,58 +1,66 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Server, FileText, ShieldCheck, AlertTriangle,
   BookOpen, Network, MessageSquare, FlaskConical, FileBarChart,
-  GitCompare, Scroll, Settings, LogOut, Zap
+  GitCompare, Scroll, Settings, LogOut, Zap, Lock, Activity,
+  ChevronLeft, ChevronRight, HelpCircle, BookMarked
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 const sections = [
   {
     label: 'Overview',
-    items: [{ to: '/dashboard', label: 'Overview', icon: LayoutDashboard }],
-  },
-  {
-    label: 'Assets',
     items: [
-      { to: '/devices', label: 'Devices', icon: Server },
-      { to: '/configurations', label: 'Configurations', icon: FileText },
+      { to: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     ],
   },
   {
-    label: 'Security',
+    label: 'Infrastructure',
     items: [
-      { to: '/compliance', label: 'Compliance', icon: ShieldCheck },
-      { to: '/findings', label: 'Findings', icon: AlertTriangle },
-      { to: '/remediation', label: 'Remediation', icon: Zap },
+      { to: '/app/devices', label: 'Devices', icon: Server },
+      { to: '/app/configurations', label: 'Configurations', icon: FileText },
     ],
   },
   {
-    label: 'Intelligence',
+    label: 'Security & Posture',
     items: [
-      { to: '/training', label: 'Training Studio', icon: BookOpen },
-      { to: '/security-graph', label: 'Security Graph', icon: Network },
-      { to: '/query', label: 'NL Query', icon: MessageSquare },
-      { to: '/simulation', label: 'What-If', icon: FlaskConical },
+      { to: '/app/compliance', label: 'Compliance', icon: ShieldCheck },
+      { to: '/app/findings', label: 'Findings', icon: AlertTriangle },
+      { to: '/app/security-graph', label: 'Security Graph', icon: Network },
+      { to: '/app/drift', label: 'Configuration Drift', icon: GitCompare },
+    ],
+  },
+  {
+    label: 'Intelligence & AI',
+    items: [
+      { to: '/app/training', label: 'AI Training Studio', icon: BookOpen },
+      { to: '/app/query', label: 'Security Query', icon: MessageSquare },
+      { to: '/app/simulation', label: 'What-If Simulator', icon: FlaskConical },
     ],
   },
   {
     label: 'Operations',
     items: [
-      { to: '/reports', label: 'Reports', icon: FileBarChart },
-      { to: '/drift', label: 'Drift Analysis', icon: GitCompare },
-      { to: '/audit', label: 'Audit Trail', icon: Scroll },
+      { to: '/app/remediation', label: 'Remediation Center', icon: Zap },
+      { to: '/app/reports', label: 'Audit Reports', icon: FileBarChart },
     ],
   },
   {
-    label: 'System',
-    items: [{ to: '/settings', label: 'Settings', icon: Settings }],
+    label: 'Administration',
+    items: [
+      { to: '/app/audit', label: 'Audit Trail', icon: Scroll },
+      { to: '/app/integrity', label: 'Evidence Integrity', icon: Lock },
+      { to: '/app/system-health', label: 'System Health', icon: Activity },
+      { to: '/app/settings', label: 'Platform Settings', icon: Settings },
+    ],
   },
 ];
 
 export function Sidebar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [collapsed, setCollapsed] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -60,70 +68,154 @@ export function Sidebar() {
   };
 
   return (
-    <nav className="app-sidebar" aria-label="Main navigation">
-      {/* Logo */}
-      <div className="sidebar-logo">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+    <nav
+      className="app-sidebar"
+      aria-label="Main navigation"
+      style={{
+        width: collapsed ? 68 : 240,
+        minWidth: collapsed ? 68 : 240,
+        transition: 'width 0.2s ease, min-width 0.2s ease',
+        background: '#0D1311',
+        borderRight: '1px solid #1E2822',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+      }}
+    >
+      {/* Brand Header */}
+      <div
+        style={{
+          padding: '16px',
+          borderBottom: '1px solid #1E2822',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: collapsed ? 'center' : 'space-between',
+        }}
+      >
+        <NavLink to="/app/dashboard" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
           <img
             src="/app-logo.png"
             alt="Cipher-X Logo"
             style={{
-              width: 32,
-              height: 32,
-              borderRadius: 8,
+              width: 30,
+              height: 30,
+              borderRadius: 6,
               objectFit: 'contain',
-              boxShadow: '0 0 12px rgba(255, 107, 0, 0.35)',
-              border: '1px solid rgba(255, 107, 0, 0.4)',
-              flexShrink: 0
+              boxShadow: '0 0 12px rgba(255, 116, 23, 0.35)',
+              border: '1px solid rgba(255, 116, 23, 0.4)',
+              flexShrink: 0,
             }}
           />
-          <div>
-            <div className="sidebar-logo-name" style={{ letterSpacing: '0.05em' }}>CIPHER-X</div>
-            <div className="sidebar-logo-tag" style={{ marginTop: 2 }}>Security Compliance</div>
-          </div>
-        </div>
+          {!collapsed && (
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 800, color: '#F2F4EA', letterSpacing: '0.06em' }}>CIPHER-X</div>
+              <div style={{ fontSize: 10, color: '#687369', letterSpacing: '0.04em' }}>Compliance Auditor</div>
+            </div>
+          )}
+        </NavLink>
       </div>
 
-      {/* Navigation sections */}
-      <div style={{ flex: 1 }}>
-        {sections.map(section => (
-          <div key={section.label}>
-            <div className="sidebar-section-label">{section.label}</div>
-            {section.items.map(item => (
+      {/* Navigation Sections */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '12px 8px' }}>
+        {sections.map((section) => (
+          <div key={section.label} style={{ marginBottom: 16 }}>
+            {!collapsed && (
+              <div
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.08em',
+                  color: '#687369',
+                  padding: '6px 10px',
+                }}
+              >
+                {section.label}
+              </div>
+            )}
+            {section.items.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) => `sidebar-nav-item${isActive ? ' active' : ''}`}
-                title={item.label}
+                title={collapsed ? item.label : undefined}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  padding: collapsed ? '9px 0' : '9px 12px',
+                  justifyContent: collapsed ? 'center' : 'flex-start',
+                  borderRadius: 6,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: '#AAB2A8',
+                  textDecoration: 'none',
+                  marginBottom: 2,
+                  transition: 'all 0.15s ease',
+                }}
               >
-                <item.icon className="icon" />
-                <span>{item.label}</span>
+                <item.icon size={16} />
+                {!collapsed && <span>{item.label}</span>}
               </NavLink>
             ))}
           </div>
         ))}
       </div>
 
-      {/* User footer */}
-      <div style={{ padding: '12px 16px', borderTop: '1px solid var(--cx-dark-border)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-          <div style={{
-            width: 28, height: 28, borderRadius: '50%', background: 'var(--cx-dark-elevated)',
-            border: '1px solid var(--cx-dark-border)', display: 'flex', alignItems: 'center',
-            justifyContent: 'center', fontSize: 11, fontWeight: 700, color: 'var(--cx-orange)'
-          }}>
-            {user?.username?.charAt(0).toUpperCase() || 'A'}
-          </div>
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--cx-dark-text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {user?.username || 'admin'}
-            </div>
-            <div style={{ fontSize: 10, color: 'var(--cx-dark-muted)' }}>{user?.role || 'ADMIN'}</div>
-          </div>
-        </div>
-        <button className="btn btn-ghost btn-sm" onClick={handleLogout} style={{ width: '100%', justifyContent: 'flex-start' }}>
-          <LogOut size={13} /> <span>Sign Out</span>
+      {/* Bottom User & Collapse Bar */}
+      <div style={{ borderTop: '1px solid #1E2822', padding: 8 }}>
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          style={{
+            width: '100%',
+            background: 'transparent',
+            border: 'none',
+            color: '#687369',
+            padding: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            borderRadius: 6,
+            marginBottom: 4,
+          }}
+          title={collapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
+        >
+          {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
         </button>
+
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: collapsed ? 'center' : 'space-between',
+            padding: '8px 10px',
+            background: '#121A15',
+            borderRadius: 6,
+          }}
+        >
+          {!collapsed && (
+            <div style={{ overflow: 'hidden' }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#F2F4EA', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                {user?.username || 'Security Admin'}
+              </div>
+              <div style={{ fontSize: 10, color: '#25B981' }}>Authenticated</div>
+            </div>
+          )}
+          <button
+            onClick={handleLogout}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#AAB2A8',
+              cursor: 'pointer',
+              padding: 4,
+            }}
+            title="Sign Out"
+          >
+            <LogOut size={15} />
+          </button>
+        </div>
       </div>
     </nav>
   );

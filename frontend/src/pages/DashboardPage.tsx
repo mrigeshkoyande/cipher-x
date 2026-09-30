@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Server, ShieldCheck, AlertTriangle, Activity, Upload, ArrowRight } from 'lucide-react';
+import { Server, Upload, ArrowRight, AlertCircle } from 'lucide-react';
 import { api, Device, Finding, ComplianceSummary } from '../api/client';
 import { StatusBadge, SeverityBadge } from '../components/common/StatusBadge';
 import { SkeletonCard, SkeletonTable } from '../components/common/Skeleton';
@@ -68,11 +68,17 @@ export function DashboardPage() {
           <p className="page-subtitle">Real-time network security compliance posture</p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <Link to="/configurations/upload" className="btn btn-primary">
+          <Link to="/app/configurations/upload" className="btn btn-primary">
             <Upload size={14} /> Upload Config
           </Link>
         </div>
       </div>
+
+      {error && (
+        <div style={{ background: 'rgba(224, 90, 97, 0.1)', border: '1px solid #E05A61', borderRadius: 8, padding: '10px 16px', marginBottom: 16, color: '#E05A61', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
+          <AlertCircle size={15} /> {error}
+        </div>
+      )}
 
       {/* Hero — Security Posture */}
       <div className="posture-hero" style={{ marginBottom: 20 }}>
@@ -241,7 +247,7 @@ export function DashboardPage() {
         <div className="card" style={{ gridColumn: '1 / -1' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <h3 style={{ fontSize: 14 }}>Recent Findings</h3>
-            <Link to="/findings" className="btn btn-secondary btn-sm">
+            <Link to="/app/findings" className="btn btn-secondary btn-sm">
               View All Findings <ArrowRight size={12} />
             </Link>
           </div>
@@ -257,7 +263,7 @@ export function DashboardPage() {
                 </thead>
                 <tbody>
                   {recentFindings.map(f => (
-                    <tr key={f.id} style={{ cursor: 'pointer' }} onClick={() => navigate(`/findings/${f.id}`)}>
+                    <tr key={f.id} style={{ cursor: 'pointer' }} onClick={() => navigate(`/app/findings/${f.id}`)}>
                       <td><SeverityBadge severity={f.severity} /></td>
                       <td style={{ fontWeight: 500 }}>{f.title}</td>
                       <td style={{ fontSize: 12, color: 'var(--cx-muted)' }}>{f.device_id.slice(0, 8)}</td>
